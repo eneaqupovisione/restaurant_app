@@ -1,0 +1,2997 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solymar OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500@display=swap" rel="stylesheet">
+<style>
+:root {
+  --white:      #ffffff;
+  --off:        #f7f6f2;
+  --off2:       #efede7;
+  --border:     #e0ddd5;
+  --border2:    #ccc9c0;
+  --text:       #1a1917;
+  --text2:      #5a5750;
+  --text3:      #9a9790;
+  --emerald:    #1a6b4a;
+  --emerald2:   #2d8f63;
+  --emerald-l:  #e8f4ee;
+  --emerald-m:  #b8ddc8;
+  --red:        #c0392b;
+  --red-l:      #fdf0ee;
+  --amber:      #b07d2a;
+  --amber-l:    #fdf5e6;
+  --radius:     10px;
+  --radius-sm:  6px;
+  --shadow:     0 2px 12px rgba(0,0,0,0.07);
+  --shadow-lg:  0 8px 32px rgba(0,0,0,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--off);
+  color: var(--text);
+  font-size: 14px;
+}
+
+/* ── ROUTER ── */
+.page { display:none; height:100vh; overflow:hidden; flex-direction:column; }
+.page.active { display:flex; }
+
+/* ══════════════════════════════════════════
+   HOME — planimetria
+══════════════════════════════════════════ */
+#home {
+  background: var(--off);
+  align-items: center;
+  justify-content: center;
+  padding: 16px 24px;
+  gap: 12px;
+}
+.home-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  align-self: flex-start;
+  width: 100%;
+}
+.home-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 30px;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: .02em;
+}
+.home-sub {
+  font-size: 12px;
+  color: var(--text3);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.building {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  border: 2.5px solid var(--text);
+  border-radius: var(--radius);
+  background: var(--white);
+}
+.room {
+  position: absolute;
+  border: 1.5px solid var(--border2);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all .18s;
+  gap: 5px;
+  user-select: none;
+}
+.room:hover { transform: scale(1.04); z-index: 5; box-shadow: var(--shadow); }
+.room .r-icon { font-size: 20px; line-height: 1; }
+.room .r-name {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--text2);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.3;
+}
+.room.cantina    { top:4%; left:1.5%; width:16%; height:34%; border-color: var(--emerald); background: var(--emerald-l); }
+.room.armadio    { top:42%; left:1.5%; width:16%; height:28%; border-color: #378ADD; background: #E6F1FB; }
+.room.prenotazioni { top:42%; left:50%; transform:translateX(-50%); width:36%; height:18%; border-color: var(--amber); background: var(--amber-l); }
+.room.sala       { top:4%; left:50%; transform:translateX(-50%); width:28%; height:32%; border-color: #9B6DD4; background: #F0EAFD; }
+.room.bacheca    { top:4%; right:1.5%; width:13%; height:34%; border-color: #D4537E; background: #FBEAF0; }
+.room.cassa      { bottom:13%; right:1.5%; width:22%; height:22%; border-color: var(--red); background: var(--red-l); }
+.room.personale  { bottom:13%; left:46%; transform:translateX(-50%); width:20%; height:20%; border-color: #7F77DD; background: #EEEDFE; }
+.room.personale:hover { transform: translateX(-50%) scale(1.04); }
+.room.sala:hover { transform: translateX(-50%) scale(1.04); }
+.room.prenotazioni:hover { transform: translateX(-50%) scale(1.04); }
+.logistico-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 11%;
+  border-top: 1.5px solid var(--border2);
+  background: var(--off2);
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  gap: 8px;
+  transition: background .15s;
+}
+.logistico-bar:hover { background: var(--off); }
+.logistico-bar .r-icon { font-size: 16px; }
+.logistico-bar .r-name { font-size: 9px; font-weight: 500; color: var(--text3); letter-spacing: .07em; text-transform: uppercase; }
+
+/* tab bar home */
+.home-tabs {
+  display: flex;
+  width: 100%;
+  
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+  overflow: hidden;
+}
+.home-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 6px;
+  cursor: pointer;
+  gap: 4px;
+  border-right: 1px solid var(--border);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text2);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  transition: background .15s;
+}
+.home-tab:last-child { border-right: none; }
+.home-tab:hover { background: var(--off); color: var(--text); }
+.home-tab .t-icon { font-size: 18px; }
+
+/* ══════════════════════════════════════════
+   INNER PAGE SHELL
+══════════════════════════════════════════ */
+.inner-topbar {
+  height: 56px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 14px;
+  flex-shrink: 0;
+}
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: var(--text2);
+  font-size: 13px;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  transition: all .15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.back-btn:hover { background: var(--off); color: var(--text); border-color: var(--border2); }
+.inner-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: .01em;
+}
+.inner-subtitle {
+  font-size: 12px;
+  color: var(--text3);
+  margin-left: auto;
+}
+
+/* ══════════════════════════════════════════
+   CANTINA
+══════════════════════════════════════════ */
+#cantina { background: var(--off); }
+.cantina-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+/* sidebar cantina */
+.cantina-sidebar {
+  width: 200px;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  flex-shrink: 0;
+}
+.cs-section {
+  padding: 6px 16px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--text3);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-top: 8px;
+}
+.cs-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text2);
+  transition: all .15s;
+  border-left: 2px solid transparent;
+}
+.cs-item:hover { background: var(--off); color: var(--text); }
+.cs-item.active { background: var(--emerald-l); color: var(--emerald); border-left-color: var(--emerald); font-weight: 500; }
+.cs-item .cs-icon { font-size: 16px; width: 20px; text-align: center; }
+.cs-badge {
+  margin-left: auto;
+  font-size: 10px;
+  background: var(--off2);
+  color: var(--text3);
+  padding: 1px 7px;
+  border-radius: 20px;
+}
+.cs-item.active .cs-badge { background: var(--emerald-m); color: var(--emerald); }
+.cs-badge.warn { background: #fde8c8; color: var(--amber); }
+
+/* cantina main */
+.cantina-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+.cantina-main::-webkit-scrollbar { width: 4px; }
+.cantina-main::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* location header */
+.loc-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.loc-icon { font-size: 28px; }
+.loc-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 500; }
+.loc-desc { font-size: 12px; color: var(--text3); }
+.loc-stats {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+.loc-stat {
+  text-align: center;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+}
+.loc-stat .ls-val { font-size: 20px; font-weight: 500; color: var(--text); }
+.loc-stat .ls-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; }
+
+/* filter bar */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  background: var(--white);
+  color: var(--text);
+  outline: none;
+  transition: border-color .15s;
+}
+.search-input:focus { border-color: var(--emerald2); }
+.filter-chip {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px;
+  cursor: pointer;
+  background: var(--white);
+  color: var(--text2);
+  transition: all .15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.filter-chip:hover { border-color: var(--emerald); color: var(--emerald); }
+.filter-chip.active { background: var(--emerald); color: #fff; border-color: var(--emerald); }
+
+/* action buttons */
+.action-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover { background: var(--off); }
+.btn.primary { background: var(--emerald); color: #fff; border-color: var(--emerald); }
+.btn.primary:hover { background: var(--emerald2); }
+.btn.danger { background: var(--red-l); color: var(--red); border-color: #e8b4ae; }
+.btn.danger:hover { background: #fbe0de; }
+.btn.amber { background: var(--amber-l); color: var(--amber); border-color: #e8d4a0; }
+
+/* wine table */
+.wine-table-wrap {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.wine-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.wine-table th {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text3);
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  background: var(--off);
+}
+.wine-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  vertical-align: middle;
+}
+.wine-table tr:last-child td { border-bottom: none; }
+.wine-table tr:hover td { background: var(--off); }
+.wine-row { cursor: pointer; }
+.wine-name { font-weight: 500; color: var(--text); }
+.wine-producer { font-size: 11px; color: var(--text3); }
+.tipo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.tipo-rosso   { background: #fde8e8; color: #b03030; }
+.tipo-bianco  { background: #fdf8e0; color: #8a7020; }
+.tipo-rose    { background: #fde8f0; color: #b03070; }
+.tipo-orange  { background: #fdecd8; color: #a05010; }
+.tipo-bollicine { background: #e8f0fd; color: #3060b0; }
+.qty-cell { font-size: 15px; font-weight: 500; text-align: center; }
+.qty-low { color: var(--red); }
+.qty-ok  { color: var(--emerald); }
+.qty-warn { color: var(--amber); }
+.row-actions { display: flex; gap: 6px; opacity: 0; transition: opacity .15s; }
+.wine-table tr:hover .row-actions { opacity: 1; }
+.row-btn {
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--text2);
+  font-family: 'DM Sans', sans-serif;
+  transition: all .12s;
+}
+.row-btn:hover { background: var(--off2); }
+.row-btn.sell { border-color: var(--emerald); color: var(--emerald); }
+.row-btn.sell:hover { background: var(--emerald-l); }
+.row-btn.move { border-color: var(--amber); color: var(--amber); }
+.row-btn.move:hover { background: var(--amber-l); }
+
+/* empty state */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text3);
+}
+.empty-state .e-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-state .e-title { font-size: 16px; color: var(--text2); margin-bottom: 6px; }
+
+/* ── MAÎTRE (wine master database) ── */
+.maitre-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+.wine-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: all .18s;
+}
+.wine-card:hover { border-color: var(--emerald); box-shadow: var(--shadow); }
+.wc-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.wc-name { font-size: 15px; font-weight: 500; color: var(--text); line-height: 1.3; }
+.wc-producer { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.wc-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.wc-tag {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--off2);
+  color: var(--text2);
+}
+.wc-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 10px; }
+.wc-price { font-size: 16px; font-weight: 500; color: var(--text); }
+.wc-stock { display: flex; gap: 8px; }
+.wc-stock-pill { font-size: 10px; padding: 2px 8px; border-radius: 10px; }
+/* ── JSON drop zone ── */
+.drop-zone {
+  border: 2px dashed var(--border2);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+  background: var(--white);
+  margin-bottom: 16px;
+}
+.drop-zone:hover, .drop-zone.dragover {
+  border-color: var(--emerald);
+  background: var(--emerald-l);
+}
+.drop-zone .dz-icon { font-size: 28px; margin-bottom: 6px; }
+.drop-zone .dz-title { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 3px; }
+.drop-zone .dz-sub   { font-size: 11px; color: var(--text3); }
+
+
+/* ══════════════════════════════════════════
+   PRENOTAZIONI
+══════════════════════════════════════════ */
+#prenotazioni { background: var(--off); }
+.pren-body { flex:1; display:flex; overflow:hidden; }
+
+/* left: tavoli */
+.pren-tavoli {
+  width: 340px;
+  flex-shrink: 0;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.pren-tavoli-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pren-svc-tabs { display: flex; gap: 6px; }
+.svc-tab {
+  flex:1;
+  padding: 7px;
+  text-align: center;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--white);
+  color: var(--text2);
+  transition: all .15s;
+  font-family: 'DM Sans', sans-serif;
+}
+.svc-tab.active.pranzo { background: var(--amber-l); color: var(--amber); border-color: #e8d4a0; }
+.svc-tab.active.cena   { background: var(--emerald-l); color: var(--emerald); border-color: var(--emerald-m); }
+
+.tavoli-outer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.sala-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 10px 12px 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--white);
+}
+.sala-tab {
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  color: var(--text3);
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  transition: all .15s;
+  margin-bottom: -1px;
+}
+.sala-tab:hover { color: var(--text2); background: var(--off); }
+.sala-tab.active { color: var(--text); background: var(--white); border-color: var(--border); border-bottom-color: var(--white); font-weight: 500; }
+.tavoli-map {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 5px;
+  align-content: start;
+}
+.tavolo {
+  aspect-ratio: 1;
+  border: 1.5px solid var(--border);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all .15s;
+  background: var(--white);
+  gap: 2px;
+  min-width: 0;
+}
+.tavolo:hover { border-color: var(--emerald); background: var(--emerald-l); }
+.tavolo.occupied-pranzo { background: var(--amber-l); border-color: #d4a840; }
+.tavolo.occupied-cena   { background: var(--emerald-l); border-color: var(--emerald); }
+.tavolo.cell-empty { background: var(--off); border-color: transparent; cursor: default; }
+.tavolo.cell-empty:hover { background: var(--off); border-color: transparent; }
+.tavolo.edit-mode { cursor: pointer; }
+.tavolo.cell-empty.edit-mode { border: 1.5px dashed var(--border2); background: var(--off); cursor: pointer; }
+.tavolo.cell-empty.edit-mode:hover { background: var(--emerald-l); border-color: var(--emerald); }
+.tavolo.cell-placed.edit-mode { border-color: var(--red); }
+.tavolo.cell-placed.edit-mode:hover { background: var(--red-l); border-color: var(--red); }
+.tavolo .t-num { font-size: 10px; font-weight: 500; color: var(--text); line-height: 1; }
+.tavolo .t-info { font-size: 8px; color: var(--text3); text-align: center; line-height: 1.2; }
+.tavolo.occupied-pranzo .t-info { color: var(--amber); }
+.tavolo.occupied-cena .t-info   { color: var(--emerald); }
+.edit-bar {
+  display: none;
+  padding: 8px 12px;
+  background: #fff8e6;
+  border-bottom: 1px solid #e8d4a0;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--amber);
+}
+.edit-bar.active { display: flex; }
+.edit-bar-title { font-weight: 500; flex: 1; }
+
+/* right: calendario + lista */
+.pren-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.pren-right-top {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.date-nav-btn {
+  width: 30px; height: 30px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text2);
+  transition: all .15s;
+}
+.date-nav-btn:hover { border-color: var(--border2); color: var(--text); }
+.date-display {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 500;
+  min-width: 200px;
+  text-align: center;
+}
+.oggi-btn {
+  padding: 5px 12px;
+  border: 1px solid var(--emerald-m);
+  border-radius: var(--radius-sm);
+  background: var(--emerald-l);
+  color: var(--emerald);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all .15s;
+}
+.oggi-btn:hover { background: var(--emerald); color: #fff; }
+.nuova-btn {
+  margin-left: auto;
+  padding: 7px 14px;
+  background: var(--emerald);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background .15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.nuova-btn:hover { background: var(--emerald2); }
+
+/* week strip */
+.week-strip {
+  display: flex;
+  padding: 10px 20px;
+  gap: 6px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.week-strip::-webkit-scrollbar { display: none; }
+.week-day {
+  flex-shrink: 0;
+  width: 52px;
+  padding: 6px;
+  text-align: center;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all .15s;
+}
+.week-day:hover { background: var(--off); }
+.week-day.selected { border-color: var(--emerald); background: var(--emerald-l); }
+.week-day.today .wd-num { color: var(--emerald); font-weight: 600; }
+.wd-name { font-size: 9px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; }
+.wd-num  { font-size: 18px; font-weight: 400; color: var(--text); font-family: 'Cormorant Garamond', serif; }
+.wd-dots { display: flex; gap: 3px; justify-content: center; margin-top: 3px; }
+.wd-dot  { width: 4px; height: 4px; border-radius: 50%; }
+.wd-dot.pranzo { background: var(--amber); }
+.wd-dot.cena   { background: var(--emerald); }
+
+/* reservation list */
+.res-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 20px;
+}
+.res-list::-webkit-scrollbar { width: 4px; }
+.res-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+.res-svc-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  margin-top: 6px;
+}
+.res-svc-badge {
+  padding: 3px 12px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.res-svc-badge.pranzo { background: var(--amber-l); color: var(--amber); }
+.res-svc-badge.cena   { background: var(--emerald-l); color: var(--emerald); }
+.res-svc-info { font-size: 12px; color: var(--text3); }
+.res-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all .15s;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+}
+.res-card:hover { border-color: var(--border2); box-shadow: var(--shadow); }
+.res-card.pranzo-card { border-left: 3px solid var(--amber); }
+.res-card.cena-card   { border-left: 3px solid var(--emerald); }
+.rc-name { font-weight: 500; font-size: 14px; }
+.rc-detail { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.rc-time { font-size: 14px; font-weight: 500; }
+.rc-time.pranzo { color: var(--amber); }
+.rc-time.cena   { color: var(--emerald); }
+.rc-guests { font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 4px; }
+.stato-badge {
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 500;
+}
+.stato-confermata { background: var(--emerald-l); color: var(--emerald); }
+.stato-arrivata   { background: #e6f0fd; color: #2060b0; }
+.stato-noshow     { background: var(--red-l); color: var(--red); }
+.add-empty {
+  border: 1.5px dashed var(--border2);
+  border-radius: var(--radius);
+  padding: 16px;
+  text-align: center;
+  color: var(--text3);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all .15s;
+  margin-bottom: 8px;
+}
+.add-empty:hover { border-color: var(--emerald); color: var(--emerald); }
+
+/* ── MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s;
+}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 28px;
+  width: 480px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: translateY(10px);
+  transition: transform .2s;
+  box-shadow: var(--shadow-lg);
+}
+.modal-overlay.open .modal { transform: translateY(0); }
+.modal-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 500;
+  margin-bottom: 20px;
+}
+.form-row { margin-bottom: 14px; }
+.form-row label { display: block; font-size: 11px; font-weight: 500; color: var(--text2); margin-bottom: 5px; letter-spacing: .04em; text-transform: uppercase; }
+.form-input, .form-select, .form-textarea {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--white);
+  outline: none;
+  transition: border-color .15s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--emerald2); }
+.form-textarea { resize: vertical; min-height: 72px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modal-actions { display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end; }
+.modal-actions .btn { padding: 9px 20px; }
+
+/* movement modal specifics */
+.move-loc-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+.loc-option {
+  padding: 10px;
+  text-align: center;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all .15s;
+}
+.loc-option:hover { border-color: var(--emerald); background: var(--emerald-l); }
+.loc-option.selected { border-color: var(--emerald); background: var(--emerald-l); color: var(--emerald); font-weight: 500; }
+.loc-option .lo-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+/* ══════════════════════════════════════════
+   PLACEHOLDER pages
+══════════════════════════════════════════ */
+.placeholder-body {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--text3);
+}
+.placeholder-body .ph-icon { font-size: 48px; }
+.placeholder-body .ph-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--text2); }
+.placeholder-body .ph-desc  { font-size: 13px; text-align: center; max-width: 320px; line-height: 1.6; }
+
+/* animations */
+@keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.anim { animation: fadeIn .2s ease; }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .pren-body { flex-direction: column; }
+  .pren-tavoli { width: 100%; height: 52vh; border-right: none; border-bottom: 1px solid var(--border); }
+  .pren-right  { flex: 1; min-height: 0; }
+  .cantina-body { flex-direction: column; }
+  .cantina-sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); flex-direction: row; flex-wrap: wrap; padding: 8px; gap: 2px; overflow-x: auto; }
+  .cs-section { display: none; }
+  .cs-item { padding: 6px 10px; font-size: 11px; border-left: none; border-bottom: 2px solid transparent; white-space: nowrap; }
+  .cs-item.active { border-bottom-color: var(--emerald); border-left: none; }
+  .inner-topbar { padding: 0 12px; }
+  .inner-title { font-size: 18px; }
+  .pren-right-top { padding: 10px 12px; gap: 8px; flex-wrap: wrap; }
+  .date-display { font-size: 16px; min-width: 160px; }
+  .nuova-btn { font-size: 11px; padding: 6px 10px; }
+  .room .r-icon { font-size: 16px; }
+  .room .r-name { font-size: 8px; }
+  .home-tabs { border-radius: var(--radius-sm); }
+  .home-tab { font-size: 9px; padding: 8px 4px; }
+  .home-tab .t-icon { font-size: 16px; }
+  .modal { padding: 20px 16px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .loc-header { flex-wrap: wrap; }
+  .loc-stats { margin-left: 0; }
+  .filter-bar { gap: 6px; }
+  .filter-chip { font-size: 11px; padding: 5px 10px; }
+}
+@media (max-width: 480px) {
+  .pren-tavoli { height: 44vh; }
+  .week-strip { padding: 8px 12px; }
+  .week-day { width: 44px; }
+  .wd-num { font-size: 15px; }
+  .res-list { padding: 12px; }
+  .res-card { grid-template-columns: 1fr auto; gap: 6px; }
+  .stato-badge { display: none; }
+}
+
+/* ══════════════════════════════════════════
+   SALA
+══════════════════════════════════════════ */
+#sala { background: var(--off); }
+.sala-body { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+.sala-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+.sala-svc-pill {
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all .15s;
+  background: var(--white);
+  color: var(--text2);
+}
+.sala-svc-pill.active.pranzo { background: var(--amber-l); color: var(--amber); border-color: #e8d4a0; }
+.sala-svc-pill.active.cena   { background: var(--emerald-l); color: var(--emerald); border-color: var(--emerald-m); }
+.sala-counter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text2);
+  padding: 5px 12px;
+  background: var(--off);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+.sala-counter strong { color: var(--text); }
+.sala-confirm-btn {
+  margin-left: auto;
+  padding: 7px 20px;
+  background: var(--emerald);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: background .15s;
+}
+.sala-confirm-btn:hover { background: var(--emerald2); }
+.sala-confirm-btn:disabled { background: var(--border2); cursor: not-allowed; }
+.sala-content { flex:1; display:flex; overflow:hidden; }
+/* left: griglia + batch */
+.sala-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: 1px solid var(--border);
+}
+.sala-filter-bar {
+  display: flex;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+.sala-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 7px;
+  align-content: start;
+}
+.sala-grid::-webkit-scrollbar { width: 4px; }
+.sala-grid::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+.sala-wine-cell {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .15s;
+  background: var(--white);
+  user-select: none;
+  position: relative;
+}
+.sala-wine-cell:hover { border-color: var(--border2); }
+.sala-wine-cell.selected {
+  border-color: #9B6DD4;
+  background: #F0EAFD;
+  box-shadow: 0 0 0 2px rgba(155,109,212,.15);
+  cursor: grab;
+}
+.sala-wine-cell.selected:active {
+  cursor: grabbing;
+}
+.sala-wine-cell.out-of-stock { opacity: .4; cursor: not-allowed; }
+.swc-name { font-size: 10px; font-weight: 500; color: var(--text); line-height: 1.3; margin-bottom: 3px; }
+.swc-producer { font-size: 9px; color: var(--text3); margin-bottom: 4px; }
+.swc-stock { font-size: 9px; color: var(--text3); }
+.swc-stock.low { color: var(--red); }
+.swc-badge {
+  position: absolute;
+  top: 3px; right: 3px;
+  background: #9B6DD4;
+  color: #fff;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+}
+/* right: batch + refill */
+.sala-right {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--white);
+}
+.sala-panel {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.sala-panel-title {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text3);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.batch-area {
+  width: 100%;
+  min-height: 80px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  color: var(--text);
+  resize: none;
+  outline: none;
+  transition: border-color .15s;
+}
+.batch-area:focus { border-color: #9B6DD4; }
+.batch-parse-btn {
+  margin-top: 6px;
+  width: 100%;
+  padding: 7px;
+  background: var(--off);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text2);
+  transition: all .15s;
+}
+.batch-parse-btn:hover { background: var(--off2); color: var(--text); }
+.batch-preview { margin-top: 8px; }
+.bp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.bp-row:last-child { border-bottom: none; }
+.bp-name { color: var(--text); flex: 1; }
+.bp-qty  { font-weight: 500; color: #9B6DD4; margin-left: 8px; }
+.bp-warn { color: var(--amber); font-size: 10px; }
+/* refill panel */
+.refill-panel { flex:1; overflow-y:auto; padding:12px 14px; }
+.refill-empty { color: var(--text3); font-size: 12px; text-align: center; padding: 20px 0; }
+.refill-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+.refill-item:last-child { border-bottom: none; }
+.ri-name { color: var(--text); flex:1; }
+.ri-qty  { font-weight: 500; color: #9B6DD4; min-width: 20px; text-align:right; }
+.refill-actions {
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.refill-copy-btn {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--off);
+  color: var(--text2);
+  transition: all .15s;
+}
+.refill-copy-btn:hover { background: var(--off2); }
+.refill-send-btn {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #9B6DD4;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  background: #F0EAFD;
+  color: #9B6DD4;
+  transition: all .15s;
+}
+.refill-send-btn:hover { background: #9B6DD4; color:#fff; }
+/* refill badge on cantina locations */
+.refill-loc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: #F0EAFD;
+  color: #9B6DD4;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid #D4BBF4;
+  transition: all .15s;
+}
+.refill-loc-badge:hover { background: #9B6DD4; color:#fff; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     HOME
+══════════════════════════════════════════ -->
+<div class="page active" id="home">
+  <div style="display:flex;flex-direction:column;height:100%;padding:16px 24px;gap:12px;">
+    <div class="home-header">
+      <span class="home-logo">Solymar</span>
+      <span class="home-sub">Pannello operativo</span>
+    </div>
+    <div class="building">
+      <div class="room cantina"       onclick="nav('cantina')">
+        <span class="r-icon">🍷</span><span class="r-name">Cantina</span>
+      </div>
+      <div class="room armadio"       onclick="nav('armadio')">
+        <span class="r-icon">📦</span><span class="r-name">Armadio</span>
+      </div>
+      <div class="room prenotazioni"  onclick="nav('prenotazioni')">
+        <span class="r-icon">📅</span><span class="r-name">Prenotazioni</span>
+      </div>
+      <div class="room sala"          onclick="nav('sala')">
+        <span class="r-icon">🍽️</span><span class="r-name">Sala</span>
+      </div>
+      <div class="room bacheca"       onclick="nav('bacheca')">
+        <span class="r-icon">📋</span><span class="r-name">Bacheca</span>
+      </div>
+      <div class="room cassa"         onclick="nav('cassa')">
+        <span class="r-icon">💰</span><span class="r-name">Cassa &amp; Mance</span>
+      </div>
+      <div class="room personale"     onclick="nav('personale')">
+        <span class="r-icon">👥</span><span class="r-name">Personale</span>
+      </div>
+      <div class="logistico-bar"      onclick="nav('logistico')">
+        <span class="r-icon">🚚</span><span class="r-name">Logistico — riordini</span>
+      </div>
+    </div>
+    <div class="home-tabs">
+      <div class="home-tab" onclick="nav('sala')">
+        <span class="t-icon">🍽️</span><span>Sala</span>
+      </div>
+      <div class="home-tab" onclick="openNuovaPrenotazione()">
+        <span class="t-icon">➕</span><span>Prenota</span>
+      </div>
+      <div class="home-tab" onclick="nav('bacheca')">
+        <span class="t-icon">📋</span><span>Bacheca</span>
+      </div>
+      <div class="home-tab" onclick="nav('report')">
+        <span class="t-icon">📊</span><span>Report</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     CANTINA
+══════════════════════════════════════════ -->
+<div class="page" id="cantina">
+  <div class="inner-topbar">
+    <button class="back-btn" onclick="nav('home')">← Home</button>
+    <span class="inner-title">🍷 Cantina</span>
+    <span class="inner-subtitle" id="cantina-subtitle">Frigo di servizio</span>
+  </div>
+  <div class="cantina-body">
+    <!-- sidebar -->
+    <div class="cantina-sidebar">
+      <div class="cs-section">Luoghi</div>
+      <div class="cs-item active" onclick="setCantView('frigo')" id="cs-frigo">
+        <span class="cs-icon">🧊</span> Frigo di servizio
+        <span class="cs-badge" id="badge-frigo">—</span>
+      </div>
+      <div class="cs-item" onclick="setCantView('interno')" id="cs-interno">
+        <span class="cs-icon">🏠</span> Magazzino interno
+        <span class="cs-badge" id="badge-interno">—</span>
+      </div>
+      <div class="cs-item" onclick="setCantView('esterno')" id="cs-esterno">
+        <span class="cs-icon">🏭</span> Magazzino esterno
+        <span class="cs-badge" id="badge-esterno">—</span>
+      </div>
+      <div class="cs-section">Gestione</div>
+      <div class="cs-item" onclick="setCantView('carta')" id="cs-carta">
+        <span class="cs-icon">📄</span> Carta dei vini
+      </div>
+      <div class="cs-item" onclick="setCantView('maitre')" id="cs-maitre">
+        <span class="cs-icon">🎩</span> Maître
+        <span class="cs-badge" id="badge-maitre">—</span>
+      </div>
+      <div class="cs-section">Alert</div>
+      <div class="cs-item" onclick="setCantView('scorte-basse')" id="cs-scorte">
+        <span class="cs-icon">⚠️</span> Scorte basse
+        <span class="cs-badge warn" id="badge-scorte">0</span>
+      </div>
+    </div>
+    <!-- main content -->
+    <div class="cantina-main anim" id="cantina-main">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PRENOTAZIONI
+══════════════════════════════════════════ -->
+<div class="page" id="prenotazioni">
+  <div class="inner-topbar">
+    <button class="back-btn" onclick="nav('home')">← Home</button>
+    <span class="inner-title">📅 Prenotazioni</span>
+  </div>
+  <div class="pren-body">
+    <!-- sinistra: tavoli -->
+    <div class="pren-tavoli">
+      <div class="pren-tavoli-header">
+        <div style="font-size:12px;font-weight:500;color:var(--text2);">Mappa tavoli</div>
+        <div class="pren-svc-tabs">
+          <button class="svc-tab active pranzo" onclick="setSvc('pranzo')" id="tab-pranzo">☀️ Pranzo</button>
+          <button class="svc-tab cena" onclick="setSvc('cena')" id="tab-cena">🌙 Cena</button>
+        </div>
+        <button class="btn" id="edit-layout-btn" onclick="toggleEditLayout()" style="margin-top:6px;font-size:11px;padding:4px 10px;">✏️ Modifica layout</button>
+      </div>
+      <div class="edit-bar" id="edit-bar">
+        <span class="edit-bar-title">✏️ Modalità layout — clicca cella vuota per aggiungere tavolo, tavolo esistente per rimuoverlo</span>
+        <button class="btn" onclick="toggleEditLayout()" style="font-size:11px;padding:4px 10px;">✅ Fine</button>
+      </div>
+      <div class="tavoli-outer">
+        <div class="sala-tabs" id="sala-tabs">
+          <button class="sala-tab active" onclick="setSala(0)" id="sala-tab-0">Sala A</button>
+          <button class="sala-tab" onclick="setSala(1)" id="sala-tab-1">Sala B</button>
+          <button class="sala-tab" onclick="setSala(2)" id="sala-tab-2">Sala C</button>
+        </div>
+        <div class="tavoli-map" id="tavoli-map"><!-- rendered by JS --></div>
+      </div>
+    </div>
+    <!-- destra: calendario + lista -->
+    <div class="pren-right">
+      <div class="pren-right-top">
+        <button class="date-nav-btn" onclick="shiftDay(-1)">&#8592;</button>
+        <div class="date-display" id="pren-date-display"></div>
+        <button class="date-nav-btn" onclick="shiftDay(1)">&#8594;</button>
+        <button class="oggi-btn" onclick="goToday()">Oggi</button>
+        <button class="nuova-btn" onclick="openModalRes(null,null)">+ Nuova prenotazione</button>
+      </div>
+      <div class="week-strip" id="week-strip"><!-- rendered by JS --></div>
+      <div class="res-list" id="res-list"><!-- rendered by JS --></div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     SALA
+══════════════════════════════════════════ -->
+<div class="page" id="sala">
+  <div class="inner-topbar">
+    <button class="back-btn" onclick="nav('home')">← Home</button>
+    <span class="inner-title">🍽️ Sala</span>
+  </div>
+  <div class="sala-body">
+    <!-- topbar: servizio + counter + conferma -->
+    <div class="sala-topbar">
+      <button class="sala-svc-pill active pranzo" onclick="setSalaSvc('pranzo')" id="sala-pill-pranzo">☀️ Pranzo</button>
+      <button class="sala-svc-pill cena" onclick="setSalaSvc('cena')" id="sala-pill-cena">🌙 Cena</button>
+      <div class="sala-counter" id="sala-counter">
+        <strong id="sc-n">0</strong> bot. &nbsp;·&nbsp; <strong id="sc-m">0</strong> titoli
+      </div>
+      <button class="sala-confirm-btn" id="sala-confirm-btn" onclick="confermaSelezione()" disabled>Conferma</button>
+    </div>
+    <div class="sala-content">
+      <!-- left: griglia vini -->
+      <div class="sala-left">
+        <div class="sala-filter-bar" id="sala-filter-bar">
+          <!-- rendered by JS -->
+        </div>
+        <div class="sala-grid" id="sala-grid">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+      <!-- right: batch + refill -->
+      <div class="sala-right">
+        <!-- batch input -->
+        <div class="sala-panel">
+          <div class="sala-panel-title">
+            <span>Inserimento batch</span>
+            <button class="btn" style="font-size:10px;padding:2px 8px;" onclick="insertTestoBatch()">Test</button>
+          </div>
+          <textarea class="batch-area" id="batch-input" placeholder="Incolla qui la lista vini&#10;es: barolo 2&#10;prosecco 1&#10;vermentino 3" rows="5"></textarea>
+          <button class="batch-parse-btn" onclick="parseBatch()">🔍 Analizza lista</button>
+          <div id="batch-preview"></div>
+        </div>
+        <!-- refill attivo -->
+        <div class="sala-panel">
+          <div class="sala-panel-title">
+            <span>Refill attivo</span>
+            <span id="refill-count-badge" style="font-size:10px;background:#F0EAFD;color:#9B6DD4;padding:1px 7px;border-radius:10px;display:none"></span>
+          </div>
+        </div>
+        <div class="refill-panel" id="refill-panel"><!-- rendered by JS --></div>
+        <div class="refill-actions" id="refill-actions" style="display:none">
+          <button class="refill-copy-btn" onclick="copyRefill()">📋 Copia lista</button>
+          <button class="refill-send-btn" onclick="nav('cantina')">→ Vai al magazzino</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: refill magazzino (check) -->
+<div class="modal-overlay" id="modal-refill-mag">
+  <div class="modal">
+    <div class="modal-title">Refill — prelievo magazzino</div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Seleziona i vini che hai prelevato e dove li hai messi.</p>
+    <div id="rfm-list"><!-- rendered by JS --></div>
+    <div class="form-row" style="margin-top:14px;">
+      <label>Destinazione prelievo</label>
+      <div style="display:flex;gap:8px;">
+        <button class="btn active" id="rfm-dest-frigo" onclick="setRfmDest('frigo')">🧊 Frigo</button>
+        <button class="btn" id="rfm-dest-interno" onclick="setRfmDest('interno')">🏠 Magazzino interno</button>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modal-refill-mag')">Annulla</button>
+      <button class="btn primary" onclick="confermaRefillMag()">Conferma prelievo</button>
+    </div>
+  </div>
+</div>
+<!-- ══════════════════════════════════════════
+     PLACEHOLDER pages
+══════════════════════════════════════════ -->
+<div class="page" id="armadio">
+  <div class="inner-topbar"><button class="back-btn" onclick="nav('home')">← Home</button><span class="inner-title">📦 Armadio</span></div>
+  <div class="placeholder-body"><div class="ph-icon">📦</div><div class="ph-title">Armadio</div><div class="ph-desc">Gestione caffè, acque, bibite, detersivi e prodotti operativi. In costruzione.</div></div>
+</div>
+<div class="page" id="bacheca">
+  <div class="inner-topbar"><button class="back-btn" onclick="nav('home')">← Home</button><span class="inner-title">📋 Bacheca</span></div>
+  <div class="placeholder-body"><div class="ph-icon">📋</div><div class="ph-title">Bacheca</div><div class="ph-desc">Todo list operativa con priorità e stati. In costruzione.</div></div>
+</div>
+<div class="page" id="cassa">
+  <div class="inner-topbar"><button class="back-btn" onclick="nav('home')">← Home</button><span class="inner-title">💰 Cassa &amp; Mance</span></div>
+  <div class="placeholder-body"><div class="ph-icon">💰</div><div class="ph-title">Cassa &amp; Mance</div><div class="ph-desc">Registro mance, cassa serata e statistiche. In costruzione.</div></div>
+</div>
+<div class="page" id="personale">
+  <div class="inner-topbar"><button class="back-btn" onclick="nav('home')">← Home</button><span class="inner-title">👥 Personale</span></div>
+  <div class="placeholder-body"><div class="ph-icon">👥</div><div class="ph-title">Personale</div><div class="ph-desc">Rubrica team e turni per servizio. In costruzione.</div></div>
+</div>
+<div class="page" id="logistico">
+  <div class="inner-topbar"><button class="back-btn" onclick="nav('home')">← Home</button><span class="inner-title">🚚 Logistico</span></div>
+  <div class="placeholder-body"><div class="ph-icon">🚚</div><div class="ph-title">Logistico</div><div class="ph-desc">Vista aggregata riordini da cantina e armadio. In costruzione.</div></div>
+</div>
+<div class="page" id="report">
+  <div class="inner-topbar"><button class="back-btn" onclick="nav('home')">← Home</button><span class="inner-title">📊 Report</span></div>
+  <div class="placeholder-body"><div class="ph-icon">📊</div><div class="ph-title">Report &amp; Statistiche</div><div class="ph-desc">Analisi coperti, mance, vini, scorte. In costruzione.</div></div>
+</div>
+<div class="page" id="vendita-rapida">
+  <div class="inner-topbar"><button class="back-btn" onclick="nav('home')">← Home</button><span class="inner-title">🍷 Vendita rapida</span></div>
+  <div class="placeholder-body"><div class="ph-icon">🍷</div><div class="ph-title">Vendita rapida</div><div class="ph-desc">Ricerca vino, selezione e registrazione vendita in 3 tap. In costruzione.</div></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODALI
+══════════════════════════════════════════ -->
+
+<!-- Modal: movimento vino -->
+<div class="modal-overlay" id="modal-movimento">
+  <div class="modal">
+    <div class="modal-title" id="mov-title">Registra movimento</div>
+    <input type="hidden" id="mov-wine-id">
+
+    <div class="form-row" id="mov-tipo-row">
+      <label>Tipo operazione</label>
+      <div style="display:flex;gap:8px;">
+        <button class="btn active" id="movbtn-vendi" onclick="setMovTipo('vendita')">🛒 Vendi</button>
+        <button class="btn" id="movbtn-sposta" onclick="setMovTipo('spostamento')">📦 Sposta</button>
+        <button class="btn" id="movbtn-carica" onclick="setMovTipo('acquisto')">➕ Carica</button>
+        <button class="btn" id="movbtn-rettifica" onclick="setMovTipo('rettifica')">✏️ Rettifica</button>
+      </div>
+    </div>
+
+    <div class="form-row" id="mov-from-row">
+      <label>Da location</label>
+      <div class="move-loc-grid">
+        <div class="loc-option" onclick="setMovFrom('frigo')"><span class="lo-icon">🧊</span>Frigo</div>
+        <div class="loc-option" onclick="setMovFrom('interno')"><span class="lo-icon">🏠</span>Magazzino interno</div>
+        <div class="loc-option" onclick="setMovFrom('esterno')"><span class="lo-icon">🏭</span>Magazzino esterno</div>
+      </div>
+    </div>
+    <div class="form-row" id="mov-to-row" style="display:none">
+      <label>A location</label>
+      <div class="move-loc-grid">
+        <div class="loc-option" onclick="setMovTo('frigo')"><span class="lo-icon">🧊</span>Frigo</div>
+        <div class="loc-option" onclick="setMovTo('interno')"><span class="lo-icon">🏠</span>Magazzino interno</div>
+        <div class="loc-option" onclick="setMovTo('esterno')"><span class="lo-icon">🏭</span>Magazzino esterno</div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label>Quantità (bottiglie)</label>
+      <input type="number" class="form-input" id="mov-qty" min="1" value="1">
+    </div>
+    <div class="form-row">
+      <label>Note (opzionale)</label>
+      <input type="text" class="form-input" id="mov-note" placeholder="es. tavolo 5, serata privata...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modal-movimento')">Annulla</button>
+      <button class="btn primary" onclick="saveMovimento()">Conferma</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: scheda vino (maître) -->
+<div class="modal-overlay" id="modal-wine">
+  <div class="modal">
+    <div class="modal-title" id="wine-modal-title">Nuovo vino</div>
+    <input type="hidden" id="wine-edit-id">
+    <div class="form-grid">
+      <div class="form-row">
+        <label>Nome vino *</label>
+        <input type="text" class="form-input" id="wf-nome" placeholder="es. Barolo Cannubi">
+      </div>
+      <div class="form-row">
+        <label>Cantina / Produttore *</label>
+        <input type="text" class="form-input" id="wf-cantina" placeholder="es. Marchesi di Barolo">
+      </div>
+      <div class="form-row">
+        <label>Colore</label>
+        <select class="form-select" id="wf-colore">
+          <option value="rosso">Rosso</option>
+          <option value="bianco">Bianco</option>
+          <option value="rose">Rosé</option>
+          <option value="orange">Orange</option>
+          <option value="bollicine">Bollicine</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Stile</label>
+        <select class="form-select" id="wf-stile">
+          <option value="fermo">Fermo</option>
+          <option value="frizzante">Frizzante</option>
+          <option value="metodo-classico">Metodo classico</option>
+          <option value="charmat">Charmat</option>
+          <option value="ancestrale">Ancestrale</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Regione</label>
+        <input type="text" class="form-input" id="wf-regione" placeholder="es. Piemonte">
+      </div>
+      <div class="form-row">
+        <label>Paese</label>
+        <input type="text" class="form-input" id="wf-paese" value="Italia">
+      </div>
+      <div class="form-row">
+        <label>Prezzo vendita (€)</label>
+        <input type="number" class="form-input" id="wf-prezzo" min="0" step="0.5">
+      </div>
+      <div class="form-row">
+        <label>Prezzo acquisto (€)</label>
+        <input type="number" class="form-input" id="wf-costo" min="0" step="0.5">
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Fornitore</label>
+      <input type="text" class="form-input" id="wf-fornitore" placeholder="es. Vini del Territorio srl">
+    </div>
+    <div class="form-row">
+      <label>Soglia frigo (bottiglie minime)</label>
+      <input type="number" class="form-input" id="wf-soglia-frigo" min="0" value="2">
+    </div>
+    <div class="form-row">
+      <label>Soglia magazzino (allerta riordino)</label>
+      <input type="number" class="form-input" id="wf-soglia-mag" min="0" value="6">
+    </div>
+    <div class="form-row">
+      <label>Note</label>
+      <textarea class="form-textarea" id="wf-note" placeholder="Uvaggio, annata, abbinamenti consigliati..."></textarea>
+    </div>
+    <!-- stock iniziale (solo su nuovo) -->
+    <div id="stock-iniziale-block">
+      <div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.04em;">Stock iniziale</div>
+      <div class="form-grid">
+        <div class="form-row"><label>Frigo</label><input type="number" class="form-input" id="wf-s-frigo" min="0" value="0"></div>
+        <div class="form-row"><label>Magazzino interno</label><input type="number" class="form-input" id="wf-s-interno" min="0" value="0"></div>
+        <div class="form-row"><label>Magazzino esterno</label><input type="number" class="form-input" id="wf-s-esterno" min="0" value="0"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn danger" id="wine-delete-btn" onclick="deleteWine()" style="margin-right:auto;display:none;">Elimina</button>
+      <button class="btn" onclick="closeModal('modal-wine')">Annulla</button>
+      <button class="btn primary" onclick="saveWine()">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: prenotazione -->
+<div class="modal-overlay" id="modal-res">
+  <div class="modal">
+    <div class="modal-title" id="res-modal-title">Nuova prenotazione</div>
+    <input type="hidden" id="res-edit-id">
+    <div class="form-grid">
+      <div class="form-row">
+        <label>Nome *</label>
+        <input type="text" class="form-input" id="rf-nome" placeholder="es. Rossi">
+      </div>
+      <div class="form-row">
+        <label>Coperti *</label>
+        <input type="number" class="form-input" id="rf-coperti" min="1" max="20" value="2">
+      </div>
+      <div class="form-row">
+        <label>Orario *</label>
+        <input type="time" class="form-input" id="rf-orario" value="12:30">
+      </div>
+      <div class="form-row">
+        <label>Servizio</label>
+        <select class="form-select" id="rf-servizio">
+          <option value="pranzo">Pranzo</option>
+          <option value="cena">Cena</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Tavolo</label>
+        <select class="form-select" id="rf-tavolo">
+          <option value="">— non assegnato —</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Stato</label>
+        <select class="form-select" id="rf-stato">
+          <option value="confermata">Confermata</option>
+          <option value="arrivata">Arrivata</option>
+          <option value="noshow">No show</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Telefono</label>
+      <input type="tel" class="form-input" id="rf-telefono" placeholder="+39 ...">
+    </div>
+    <div class="form-row">
+      <label>Note</label>
+      <textarea class="form-textarea" id="rf-note" placeholder="Allergie, occasioni speciali, richieste..."></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn danger" id="res-delete-btn" onclick="deleteRes()" style="margin-right:auto;display:none;">Elimina</button>
+      <button class="btn" onclick="closeModal('modal-res')">Annulla</button>
+      <button class="btn primary" onclick="saveRes()">Salva</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+//  DATA LAYER — localStorage
+// ══════════════════════════════════════════
+const KEYS = { vini:'sol_vini', stock:'sol_stock', movimenti:'sol_movimenti', prenotazioni:'sol_pren', tavoli:'sol_tavoli', sale:'sol_sale', refill:'sol_refill', cassa:'sol_cassa' };
+
+function load(key) {
+  try { return JSON.parse(localStorage.getItem(key)) || null; } catch { return null; }
+}
+function save(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+}
+
+// seed data
+function initData() {
+  if (!load(KEYS.vini)) {
+    const vini = [
+      { id:'v1', nome:'Barolo Cannubi', cantina:'Marchesi di Barolo', colore:'rosso', stile:'fermo', regione:'Piemonte', paese:'Italia', prezzo:65, costo:28, fornitore:'Vinicum srl', soglia_frigo:2, soglia_mag:6, note:'Nebbiolo in purezza. Abbinamento: brasato, selvaggina.' },
+      { id:'v2', nome:'Vermentino di Gallura DOCG', cantina:'Capichera', colore:'bianco', stile:'fermo', regione:'Sardegna', paese:'Italia', prezzo:38, costo:16, fornitore:'Vinicum srl', soglia_frigo:3, soglia_mag:8, note:'Floreale e minerale. Ottimo con pesce.' },
+      { id:'v3', nome:'Franciacorta Satèn', cantina:'Bellavista', colore:'bollicine', stile:'metodo-classico', regione:'Lombardia', paese:'Italia', prezzo:55, costo:24, fornitore:'Enoteca Mare srl', soglia_frigo:4, soglia_mag:12, note:'Apericena e crostacei.' },
+      { id:'v4', nome:'Cerasuolo d\'Abruzzo', cantina:'Masciarelli', colore:'rose', stile:'fermo', regione:'Abruzzo', paese:'Italia', prezzo:28, costo:11, fornitore:'Enoteca Mare srl', soglia_frigo:3, soglia_mag:9, note:'Rosato strutturato. Versatile.' },
+      { id:'v5', nome:'Ribolla Gialla Anfora', cantina:'Gravner', colore:'orange', stile:'fermo', regione:'Friuli-VG', paese:'Italia', prezzo:72, costo:32, fornitore:'Vini Naturali Nord Est', soglia_frigo:2, soglia_mag:4, note:'Macerato 6 mesi. Per appassionati.' },
+      { id:'v6', nome:'Brunello di Montalcino', cantina:'Biondi-Santi', colore:'rosso', stile:'fermo', regione:'Toscana', paese:'Italia', prezzo:120, costo:55, fornitore:'Vinicum srl', soglia_frigo:1, soglia_mag:3, note:'Sangiovese Grosso. Grande struttura.' },
+      { id:'v7', nome:'Greco di Tufo DOCG', cantina:'Feudi di San Gregorio', colore:'bianco', stile:'fermo', regione:'Campania', paese:'Italia', prezzo:32, costo:13, fornitore:'Enoteca Mare srl', soglia_frigo:3, soglia_mag:8, note:'Agrumato e sapido. Pesce e frutti di mare.' },
+      { id:'v8', nome:'Amarone della Valpolicella', cantina:'Allegrini', colore:'rosso', stile:'fermo', regione:'Veneto', paese:'Italia', prezzo:85, costo:38, fornitore:'Vinicum srl', soglia_frigo:2, soglia_mag:6, note:'Appassimento. Carni importanti.' },
+      { id:'v9', nome:'Prosecco Superiore Rive', cantina:'Ruggeri', colore:'bollicine', stile:'charmat', regione:'Veneto', paese:'Italia', prezzo:24, costo:9, fornitore:'Enoteca Mare srl', soglia_frigo:6, soglia_mag:18, note:'Aperitivo. Il più richiesto.' },
+      { id:'v10', nome:'Etna Bianco DOC', cantina:'Benanti', colore:'bianco', stile:'fermo', regione:'Sicilia', paese:'Italia', prezzo:42, costo:18, fornitore:'Vini del Sud', soglia_frigo:2, soglia_mag:6, note:'Carricante. Vulcanico e sapido.' },
+    ];
+    save(KEYS.vini, vini);
+  }
+  if (!load(KEYS.stock)) {
+    const stock = {
+      v1:{frigo:3,interno:6,esterno:12}, v2:{frigo:4,interno:8,esterno:0},
+      v3:{frigo:6,interno:12,esterno:24}, v4:{frigo:4,interno:6,esterno:0},
+      v5:{frigo:1,interno:2,esterno:0}, v6:{frigo:1,interno:1,esterno:3},
+      v7:{frigo:3,interno:6,esterno:6}, v8:{frigo:2,interno:4,esterno:8},
+      v9:{frigo:8,interno:18,esterno:36}, v10:{frigo:2,interno:4,esterno:0},
+    };
+    save(KEYS.stock, stock);
+  }
+  if (!load(KEYS.movimenti)) save(KEYS.movimenti, []);
+  if (!load(KEYS.prenotazioni)) {
+    const oggi = new Date();
+    const fmt = d => d.toISOString().split('T')[0];
+    const dom = new Date(oggi); dom.setDate(dom.getDate()+1);
+    const pren = {
+      [fmt(oggi)]: {
+        pranzo: [
+          { id:'r1', nome:'Rossi', coperti:4, orario:'12:30', tavolo:3, telefono:'333 1234567', note:'Allergia ai crostacei', stato:'confermata' },
+          { id:'r2', nome:'Ferrari', coperti:2, orario:'13:00', tavolo:7, telefono:'', note:'', stato:'confermata' },
+        ],
+        cena: [
+          { id:'r3', nome:'Bianchi', coperti:6, orario:'20:00', tavolo:1, telefono:'347 9876543', note:'Compleanno — torta richiesta', stato:'confermata' },
+          { id:'r4', nome:'De Luca', coperti:2, orario:'20:30', tavolo:5, telefono:'', note:'', stato:'confermata' },
+          { id:'r5', nome:'Marinetti', coperti:3, orario:'21:00', tavolo:8, telefono:'320 1111222', note:'', stato:'confermata' },
+        ]
+      },
+      [fmt(dom)]: {
+        pranzo: [
+          { id:'r6', nome:'Conti', coperti:2, orario:'12:30', tavolo:2, telefono:'', note:'', stato:'confermata' },
+        ],
+        cena: []
+      }
+    };
+    save(KEYS.prenotazioni, pren);
+  }
+  if (!load(KEYS.tavoli)) {
+    // Each sala has an 8×6 grid. Tavolo objects: { id, sala, row, col, posti, nome }
+    const tavoli = [
+      {id:1,  sala:0, row:0, col:0, posti:4, nome:'T1'},
+      {id:2,  sala:0, row:0, col:1, posti:4, nome:'T2'},
+      {id:3,  sala:0, row:0, col:3, posti:2, nome:'T3'},
+      {id:4,  sala:0, row:1, col:0, posti:4, nome:'T4'},
+      {id:5,  sala:0, row:1, col:2, posti:4, nome:'T5'},
+      {id:6,  sala:0, row:2, col:1, posti:6, nome:'T6'},
+      {id:7,  sala:1, row:0, col:0, posti:4, nome:'T7'},
+      {id:8,  sala:1, row:0, col:2, posti:4, nome:'T8'},
+      {id:9,  sala:1, row:1, col:1, posti:2, nome:'T9'},
+      {id:10, sala:2, row:0, col:0, posti:8, nome:'T10'},
+      {id:11, sala:2, row:0, col:2, posti:4, nome:'T11'},
+      {id:12, sala:2, row:1, col:0, posti:4, nome:'T12'},
+    ];
+    save(KEYS.tavoli, tavoli);
+  }
+  if (!load(KEYS.sale)) {
+    save(KEYS.sale, [{id:0,nome:'Sala A'},{id:1,nome:'Sala B'},{id:2,nome:'Sala C'}]);
+  }
+}
+initData();
+
+// ══════════════════════════════════════════
+//  ROUTER
+// ══════════════════════════════════════════
+function nav(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById(id);
+  if (pg) {
+    pg.classList.add('active');
+    requestAnimationFrame(() => {
+      if (id === 'cantina') renderCantina();
+      else if (id === 'prenotazioni') renderPrenotazioni();
+      else if (id === 'sala') renderSala();
+    });
+  }
+}
+
+// ══════════════════════════════════════════
+//  CANTINA
+// ══════════════════════════════════════════
+let cantView = 'frigo';
+let cantFilter = 'tutti';
+let cantSearch = '';
+
+function setCantView(v) {
+  cantView = v;
+  document.querySelectorAll('.cs-item').forEach(el => el.classList.remove('active'));
+  const el = document.getElementById('cs-' + v);
+  if (el) el.classList.add('active');
+  renderCantina();
+}
+
+function renderCantina() {
+  updateBadges();
+  const main = document.getElementById('cantina-main');
+  main.classList.remove('anim');
+  void main.offsetWidth;
+  main.classList.add('anim');
+
+  const labels = { frigo:'Frigo di servizio', interno:'Magazzino interno', esterno:'Magazzino esterno', carta:'Carta dei vini', maitre:'Maître — archivio vini', 'scorte-basse':'Scorte basse' };
+  document.getElementById('cantina-subtitle').textContent = labels[cantView] || '';
+
+  if (cantView === 'maitre') { renderMaitre(main); return; }
+  if (cantView === 'carta')  { renderCarta(main); return; }
+  if (cantView === 'scorte-basse') { renderScorteBasse(main); return; }
+  renderLocation(main, cantView);
+}
+
+function updateBadges() {
+  const vini = load(KEYS.vini) || [];
+  const stock = load(KEYS.stock) || {};
+  const totalLoc = loc => vini.reduce((s,v) => s + ((stock[v.id]||{})[loc]||0), 0);
+  document.getElementById('badge-frigo').textContent    = totalLoc('frigo');
+  document.getElementById('badge-interno').textContent  = totalLoc('interno');
+  document.getElementById('badge-esterno').textContent  = totalLoc('esterno');
+  document.getElementById('badge-maitre').textContent   = vini.length;
+  const basse = vini.filter(v => {
+    const s = stock[v.id] || {};
+    return (s.frigo||0) < v.soglia_frigo || ((s.frigo||0)+(s.interno||0)+(s.esterno||0)) < v.soglia_mag;
+  });
+  document.getElementById('badge-scorte').textContent = basse.length;
+}
+
+function renderLocation(main, loc) {
+  const vini = load(KEYS.vini) || [];
+  const stock = load(KEYS.stock) || {};
+  const icons = { frigo:'🧊', interno:'🏠', esterno:'🏭' };
+  const names = { frigo:'Frigo di servizio', interno:'Magazzino interno', esterno:'Magazzino esterno' };
+  const totBottiglie = vini.reduce((s,v)=>s+((stock[v.id]||{})[loc]||0), 0);
+  const totTitoli    = vini.filter(v=>((stock[v.id]||{})[loc]||0)>0).length;
+
+  let filtered = vini.filter(v => {
+    const qty = (stock[v.id]||{})[loc]||0;
+    const matchSearch = cantSearch === '' || v.nome.toLowerCase().includes(cantSearch) || v.cantina.toLowerCase().includes(cantSearch);
+    const matchFilter = cantFilter === 'tutti' ? true :
+      cantFilter === 'disponibili' ? qty > 0 :
+      cantFilter === 'esauriti' ? qty === 0 :
+      v.colore === cantFilter;
+    return matchSearch && matchFilter;
+  });
+
+  const tipoBadge = t => {
+    const map = { rosso:'tipo-rosso', bianco:'tipo-bianco', rose:'tipo-rose', orange:'tipo-orange', bollicine:'tipo-bollicine' };
+    const emoji = { rosso:'🔴', bianco:'🟡', rose:'🌸', orange:'🟠', bollicine:'🫧' };
+    return `<span class="tipo-badge ${map[t]||''}">${emoji[t]||''} ${t}</span>`;
+  };
+
+  const qtyClass = (qty, soglia) => qty === 0 ? 'qty-low' : qty <= soglia ? 'qty-warn' : 'qty-ok';
+
+  main.innerHTML = `
+    <div class="loc-header">
+      <span class="loc-icon">${icons[loc]}</span>
+      <div>
+        <div class="loc-title">${names[loc]}</div>
+        <div class="loc-desc">${totTitoli} titoli presenti · ${totBottiglie} bottiglie totali</div>
+      </div>
+      <div class="loc-stats">
+        <div class="loc-stat"><div class="ls-val">${totBottiglie}</div><div class="ls-lbl">Bottiglie</div></div>
+        <div class="loc-stat"><div class="ls-val">${totTitoli}</div><div class="ls-lbl">Titoli</div></div>
+      </div>
+    </div>
+    <div class="filter-bar">
+      <input type="text" class="search-input" placeholder="Cerca vino o cantina..." value="${cantSearch}"
+        oninput="cantSearch=this.value.toLowerCase();renderCantina()">
+      ${['tutti','disponibili','rosso','bianco','rose','orange','bollicine'].map(f =>
+        `<button class="filter-chip ${cantFilter===f?'active':''}" onclick="cantFilter='${f}';renderCantina()">${f.charAt(0).toUpperCase()+f.slice(1)}</button>`
+      ).join('')}
+    </div>
+    <div class="action-bar">
+      <button class="btn primary" onclick="openMovimento(null,'${loc}')">+ Registra movimento</button>
+      ${loc!=='frigo'?`<button class="refill-loc-badge" onclick="openRefillMagazzino()">🔄 Refill attivo</button>`:''}
+    </div>
+    ${filtered.length === 0 ? `<div class="empty-state"><div class="e-icon">🍷</div><div class="e-title">Nessun vino trovato</div></div>` : `
+    <div class="wine-table-wrap">
+      <table class="wine-table">
+        <thead><tr>
+          <th>Vino</th><th>Tipo</th><th>Regione</th><th style="text-align:center">Qt. ${names[loc].split(' ')[0]}</th><th>Prezzo</th><th>Azioni</th>
+        </tr></thead>
+        <tbody>
+          ${filtered.map(v => {
+            const qty = (stock[v.id]||{})[loc]||0;
+            return `<tr class="wine-row" onclick="openMovimento('${v.id}','${loc}')">
+              <td><div class="wine-name">${v.nome}</div><div class="wine-producer">${v.cantina}</div></td>
+              <td>${tipoBadge(v.colore)}</td>
+              <td style="color:var(--text2);font-size:12px">${v.regione}</td>
+              <td class="qty-cell ${qtyClass(qty, v.soglia_frigo)}">${qty}</td>
+              <td style="font-weight:500">€${v.prezzo}</td>
+              <td><div class="row-actions">
+                ${loc==='frigo'?`<button class="row-btn sell" onclick="event.stopPropagation();quickSell('${v.id}')">Vendi</button>`:''}
+                <button class="row-btn move" onclick="event.stopPropagation();openMovimento('${v.id}','${loc}')">Sposta</button>
+              </div></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`}
+  `;
+}
+
+function renderMaitre(main) {
+  const vini = load(KEYS.vini) || [];
+  const stock = load(KEYS.stock) || {};
+  const tipoBadge = t => {
+    const map = { rosso:'tipo-rosso', bianco:'tipo-bianco', rose:'tipo-rose', orange:'tipo-orange', bollicine:'tipo-bollicine' };
+    const emoji = { rosso:'🔴', bianco:'🟡', rose:'🌸', orange:'🟠', bollicine:'🫧' };
+    return `<span class="tipo-badge ${map[t]||''}">${emoji[t]||''} ${t}</span>`;
+  };
+  const totStock = id => { const s=stock[id]||{}; return (s.frigo||0)+(s.interno||0)+(s.esterno||0); };
+
+  let filtered = vini.filter(v =>
+    cantSearch === '' || v.nome.toLowerCase().includes(cantSearch) || v.cantina.toLowerCase().includes(cantSearch)
+  );
+
+  main.innerHTML = `
+    <div class="loc-header">
+      <span class="loc-icon">🎩</span>
+      <div>
+        <div class="loc-title">Maître — Archivio vini</div>
+        <div class="loc-desc">${vini.length} titoli in carta</div>
+      </div>
+      <div class="loc-stats">
+        <button class="btn" onclick="exportMaitreJSON()">📤 Esporta JSON</button>
+        <button class="btn primary" onclick="openWineModal(null)">+ Nuovo vino</button>
+      </div>
+    </div>
+    <div class="drop-zone" id="maitre-dropzone"
+      ondragover="event.preventDefault();this.classList.add('dragover')"
+      ondragleave="this.classList.remove('dragover')"
+      ondrop="handleMaitreFileDrop(event)"
+      onclick="document.getElementById('maitre-file-input').click()">
+      <input type="file" id="maitre-file-input" accept=".json" style="display:none" onchange="handleMaitreFileInput(this)">
+      <div class="dz-icon">📂</div>
+      <div class="dz-title">Importa vini da file JSON</div>
+      <div class="dz-sub">Trascina qui un file .json oppure clicca per selezionarlo — i vini esistenti non vengono sovrascritti</div>
+    </div>
+    <div class="filter-bar">
+      <input type="text" class="search-input" placeholder="Cerca per nome o cantina..." value="${cantSearch}"
+        oninput="cantSearch=this.value.toLowerCase();renderCantina()">
+    </div>
+    <div class="maitre-grid">
+      ${filtered.map(v => `
+        <div class="wine-card" onclick="openWineModal('${v.id}')">
+          <div class="wc-header">
+            <div>
+              <div class="wc-name">${v.nome}</div>
+              <div class="wc-producer">${v.cantina}</div>
+            </div>
+            ${tipoBadge(v.colore)}
+          </div>
+          <div class="wc-meta">
+            <span class="wc-tag">${v.regione}</span>
+            <span class="wc-tag">${v.stile}</span>
+            ${v.fornitore ? `<span class="wc-tag">📦 ${v.fornitore}</span>` : ''}
+          </div>
+          <div class="wc-footer">
+            <div class="wc-price">€${v.prezzo}</div>
+            <div class="wc-stock">
+              <span class="wc-stock-pill" style="background:var(--emerald-l);color:var(--emerald)">🧊 ${(stock[v.id]||{}).frigo||0}</span>
+              <span class="wc-stock-pill" style="background:var(--off2);color:var(--text2)">🏠 ${(stock[v.id]||{}).interno||0}</span>
+              <span class="wc-stock-pill" style="background:var(--off2);color:var(--text2)">🏭 ${(stock[v.id]||{}).esterno||0}</span>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderCarta(main) {
+  const vini = load(KEYS.vini) || [];
+  const stock = load(KEYS.stock) || {};
+  const disponibili = vini.filter(v => {
+    const s = stock[v.id] || {};
+    return (s.frigo||0) + (s.interno||0) > 0;
+  });
+  const byColore = {};
+  disponibili.forEach(v => { if(!byColore[v.colore]) byColore[v.colore]=[];  byColore[v.colore].push(v); });
+  const ordine = ['bollicine','bianco','orange','rose','rosso'];
+  const emoji = { rosso:'🔴', bianco:'🟡', rose:'🌸', orange:'🟠', bollicine:'🫧' };
+  const labels = { rosso:'Vini Rossi', bianco:'Vini Bianchi', rose:'Vini Rosati', orange:'Orange Wine', bollicine:'Bollicine & Spumanti' };
+
+  main.innerHTML = `
+    <div class="loc-header">
+      <span class="loc-icon">📄</span>
+      <div>
+        <div class="loc-title">Carta dei vini</div>
+        <div class="loc-desc">${disponibili.length} titoli disponibili · aggiornata automaticamente dallo stock</div>
+      </div>
+      <div class="loc-stats">
+        <button class="btn amber" onclick="alert('Export PDF — in arrivo con la struttura definitiva della carta')">📥 Export PDF</button>
+      </div>
+    </div>
+    ${ordine.filter(c=>byColore[c]).map(c => `
+      <div style="margin-bottom:24px;">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+          <span>${emoji[c]}</span> ${labels[c]}
+        </div>
+        <div class="wine-table-wrap">
+          <table class="wine-table">
+            <thead><tr><th>Vino</th><th>Cantina</th><th>Regione</th><th>Stile</th><th style="text-align:right">Prezzo</th></tr></thead>
+            <tbody>
+              ${byColore[c].map(v => `
+                <tr>
+                  <td><div class="wine-name">${v.nome}</div></td>
+                  <td style="color:var(--text2);font-size:12px">${v.cantina}</td>
+                  <td style="color:var(--text3);font-size:12px">${v.regione}</td>
+                  <td style="color:var(--text3);font-size:12px">${v.stile}</td>
+                  <td style="text-align:right;font-weight:500">€${v.prezzo}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+function renderScorteBasse(main) {
+  const vini = load(KEYS.vini) || [];
+  const stock = load(KEYS.stock) || {};
+  const basse = vini.filter(v => {
+    const s = stock[v.id] || {};
+    return (s.frigo||0) < v.soglia_frigo || ((s.frigo||0)+(s.interno||0)+(s.esterno||0)) < v.soglia_mag;
+  });
+
+  main.innerHTML = `
+    <div class="loc-header">
+      <span class="loc-icon">⚠️</span>
+      <div>
+        <div class="loc-title">Scorte basse</div>
+        <div class="loc-desc">${basse.length} vini sotto soglia — controllare e riordinare</div>
+      </div>
+    </div>
+    ${basse.length === 0 ? `<div class="empty-state"><div class="e-icon">✅</div><div class="e-title">Tutto ok</div><div style="font-size:13px;color:var(--text3)">Nessun vino sotto soglia al momento.</div></div>` : `
+    <div class="wine-table-wrap">
+      <table class="wine-table">
+        <thead><tr><th>Vino</th><th>Frigo</th><th>Soglia frigo</th><th>Stock totale</th><th>Soglia mag.</th><th>Fornitore</th><th></th></tr></thead>
+        <tbody>
+          ${basse.map(v => {
+            const s = stock[v.id] || {};
+            const frigo = s.frigo||0, tot = frigo+(s.interno||0)+(s.esterno||0);
+            const frigoWarn = frigo < v.soglia_frigo, magWarn = tot < v.soglia_mag;
+            return `<tr>
+              <td><div class="wine-name">${v.nome}</div><div class="wine-producer">${v.cantina}</div></td>
+              <td class="qty-cell ${frigoWarn?'qty-low':'qty-ok'}">${frigo}</td>
+              <td style="color:var(--text3);text-align:center">${v.soglia_frigo}</td>
+              <td class="qty-cell ${magWarn?'qty-warn':'qty-ok'}">${tot}</td>
+              <td style="color:var(--text3);text-align:center">${v.soglia_mag}</td>
+              <td style="font-size:12px;color:var(--text2)">${v.fornitore||'—'}</td>
+              <td><button class="row-btn move" onclick="openMovimento('${v.id}','esterno')">Carica</button></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`}
+  `;
+}
+
+// ── movimento modal ──
+let movTipo = 'vendita';
+let movFrom = 'frigo';
+let movTo   = 'interno';
+
+function openMovimento(wineId, defaultLoc) {
+  movTipo = defaultLoc === 'frigo' ? 'vendita' : 'spostamento';
+  movFrom = defaultLoc || 'frigo';
+  movTo   = 'interno';
+  document.getElementById('mov-wine-id').value = wineId || '';
+  const vini = load(KEYS.vini) || [];
+  const v = wineId ? vini.find(x=>x.id===wineId) : null;
+  document.getElementById('mov-title').textContent = v ? `Movimento — ${v.nome}` : 'Registra movimento';
+  document.getElementById('mov-qty').value = 1;
+  document.getElementById('mov-note').value = '';
+  setMovTipo(movTipo);
+  setMovFrom(movFrom);
+  openModal('modal-movimento');
+}
+
+function setMovTipo(t) {
+  movTipo = t;
+  ['vendi','sposta','carica','rettifica'].forEach(k => {
+    document.getElementById('movbtn-'+k).classList.remove('active');
+  });
+  const map = { vendita:'vendi', spostamento:'sposta', acquisto:'carica', rettifica:'rettifica' };
+  document.getElementById('movbtn-'+map[t]).classList.add('active');
+  document.getElementById('mov-to-row').style.display = t === 'spostamento' ? 'block' : 'none';
+  if (t === 'acquisto') { movFrom = 'esterno'; setMovFrom('esterno'); }
+}
+
+function setMovFrom(loc) {
+  movFrom = loc;
+  document.querySelectorAll('#mov-from-row .loc-option').forEach((el,i) => {
+    const locs=['frigo','interno','esterno'];
+    el.classList.toggle('selected', locs[i]===loc);
+  });
+}
+function setMovTo(loc) {
+  movTo = loc;
+  document.querySelectorAll('#mov-to-row .loc-option').forEach((el,i) => {
+    const locs=['frigo','interno','esterno'];
+    el.classList.toggle('selected', locs[i]===loc);
+  });
+}
+
+function saveMovimento() {
+  const wineId = document.getElementById('mov-wine-id').value;
+  const qty = parseInt(document.getElementById('mov-qty').value);
+  const nota = document.getElementById('mov-note').value.trim();
+  if (!qty || qty < 1) { alert('Inserisci una quantità valida'); return; }
+
+  const stock = load(KEYS.stock) || {};
+  const movimenti = load(KEYS.movimenti) || [];
+
+  if (!wineId) { alert('Seleziona un vino prima di registrare il movimento'); return; }
+  if (!stock[wineId]) stock[wineId] = {frigo:0,interno:0,esterno:0};
+
+  const s = stock[wineId];
+  const mov = { id:'m'+Date.now(), wine_id:wineId, tipo:movTipo, da:movFrom, a:movTo, qty, nota, ts:new Date().toISOString() };
+
+  if (movTipo === 'vendita') {
+    if (s[movFrom] < qty) { alert(`Stock insufficiente in ${movFrom}: ${s[movFrom]} disponibili`); return; }
+    s[movFrom] -= qty;
+    mov.a = null;
+  } else if (movTipo === 'spostamento') {
+    if (s[movFrom] < qty) { alert(`Stock insufficiente in ${movFrom}: ${s[movFrom]} disponibili`); return; }
+    s[movFrom] -= qty;
+    s[movTo]   += qty;
+  } else if (movTipo === 'acquisto') {
+    s[movFrom] += qty;
+    mov.da = null;
+  } else if (movTipo === 'rettifica') {
+    s[movFrom] = qty;
+  }
+
+  save(KEYS.stock, stock);
+  movimenti.push(mov);
+  save(KEYS.movimenti, movimenti);
+  closeModal('modal-movimento');
+  renderCantina();
+}
+
+// ── wine modal ──
+function openWineModal(id) {
+  const vini = load(KEYS.vini) || [];
+  const stock = load(KEYS.stock) || {};
+  const v = id ? vini.find(x=>x.id===id) : null;
+  document.getElementById('wine-edit-id').value = id || '';
+  document.getElementById('wine-modal-title').textContent = v ? `Modifica — ${v.nome}` : 'Nuovo vino';
+  document.getElementById('wine-delete-btn').style.display = v ? 'flex' : 'none';
+  document.getElementById('stock-iniziale-block').style.display = v ? 'none' : 'block';
+
+  if (v) {
+    document.getElementById('wf-nome').value = v.nome;
+    document.getElementById('wf-cantina').value = v.cantina;
+    document.getElementById('wf-colore').value = v.colore;
+    document.getElementById('wf-stile').value = v.stile;
+    document.getElementById('wf-regione').value = v.regione;
+    document.getElementById('wf-paese').value = v.paese;
+    document.getElementById('wf-prezzo').value = v.prezzo;
+    document.getElementById('wf-costo').value = v.costo;
+    document.getElementById('wf-fornitore').value = v.fornitore||'';
+    document.getElementById('wf-soglia-frigo').value = v.soglia_frigo;
+    document.getElementById('wf-soglia-mag').value = v.soglia_mag;
+    document.getElementById('wf-note').value = v.note||'';
+  } else {
+    ['wf-nome','wf-cantina','wf-regione','wf-fornitore','wf-note'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('wf-paese').value = 'Italia';
+    document.getElementById('wf-colore').value = 'bianco';
+    document.getElementById('wf-stile').value = 'fermo';
+    document.getElementById('wf-prezzo').value = '';
+    document.getElementById('wf-costo').value = '';
+    document.getElementById('wf-soglia-frigo').value = 2;
+    document.getElementById('wf-soglia-mag').value = 6;
+    document.getElementById('wf-s-frigo').value = 0;
+    document.getElementById('wf-s-interno').value = 0;
+    document.getElementById('wf-s-esterno').value = 0;
+  }
+  openModal('modal-wine');
+}
+
+function saveWine() {
+  const nome = document.getElementById('wf-nome').value.trim();
+  const cantina = document.getElementById('wf-cantina').value.trim();
+  if (!nome || !cantina) { alert('Nome e Cantina sono obbligatori'); return; }
+
+  const vini = load(KEYS.vini) || [];
+  const stock = load(KEYS.stock) || {};
+  const editId = document.getElementById('wine-edit-id').value;
+
+  const data = {
+    nome, cantina,
+    colore: document.getElementById('wf-colore').value,
+    stile:  document.getElementById('wf-stile').value,
+    regione: document.getElementById('wf-regione').value.trim(),
+    paese:   document.getElementById('wf-paese').value.trim(),
+    prezzo:  parseFloat(document.getElementById('wf-prezzo').value)||0,
+    costo:   parseFloat(document.getElementById('wf-costo').value)||0,
+    fornitore: document.getElementById('wf-fornitore').value.trim(),
+    soglia_frigo: parseInt(document.getElementById('wf-soglia-frigo').value)||0,
+    soglia_mag:   parseInt(document.getElementById('wf-soglia-mag').value)||0,
+    note: document.getElementById('wf-note').value.trim(),
+  };
+
+  if (editId) {
+    const idx = vini.findIndex(v=>v.id===editId);
+    if (idx !== -1) vini[idx] = { ...vini[idx], ...data };
+  } else {
+    const id = 'v'+Date.now();
+    vini.push({ id, ...data });
+    stock[id] = {
+      frigo:   parseInt(document.getElementById('wf-s-frigo').value)||0,
+      interno: parseInt(document.getElementById('wf-s-interno').value)||0,
+      esterno: parseInt(document.getElementById('wf-s-esterno').value)||0,
+    };
+  }
+  save(KEYS.vini, vini);
+  save(KEYS.stock, stock);
+  closeModal('modal-wine');
+  renderCantina();
+}
+
+function deleteWine() {
+  const id = document.getElementById('wine-edit-id').value;
+  if (!id || !confirm('Eliminare questo vino dall\'archivio? Lo stock verrà rimosso.')) return;
+  const vini = load(KEYS.vini) || [];
+  const stock = load(KEYS.stock) || {};
+  save(KEYS.vini, vini.filter(v=>v.id!==id));
+  delete stock[id];
+  save(KEYS.stock, stock);
+  closeModal('modal-wine');
+  renderCantina();
+}
+
+
+// ── JSON import/export Maître ──
+function exportMaitreJSON() {
+  const vini  = load(KEYS.vini)  || [];
+  const stock = load(KEYS.stock) || {};
+  const out = vini.map(v => ({ ...v, stock: stock[v.id] || {frigo:0,interno:0,esterno:0} }));
+  const blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'solymar_vini_' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+}
+
+function handleMaitreFileDrop(e) {
+  e.preventDefault();
+  document.getElementById('maitre-dropzone').classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) parseMaitreJSON(file);
+}
+function handleMaitreFileInput(input) {
+  if (input.files[0]) parseMaitreJSON(input.files[0]);
+  input.value = '';
+}
+
+function parseMaitreJSON(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const arr = Array.isArray(data) ? data : [data];
+      const vini  = load(KEYS.vini)  || [];
+      const stock = load(KEYS.stock) || {};
+      let added = 0, skipped = 0;
+      arr.forEach(item => {
+        if (!item.nome || !item.cantina) { skipped++; return; }
+        const exists = vini.find(v => v.nome.toLowerCase() === item.nome.toLowerCase() && v.cantina.toLowerCase() === item.cantina.toLowerCase());
+        if (exists) { skipped++; return; }
+        const id = 'v' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+        vini.push({
+          id,
+          nome:         item.nome        || '',
+          cantina:      item.cantina      || '',
+          colore:       item.colore       || 'bianco',
+          stile:        item.stile        || 'fermo',
+          regione:      item.regione      || '',
+          paese:        item.paese        || 'Italia',
+          prezzo:       parseFloat(item.prezzo) || 0,
+          costo:        parseFloat(item.costo)  || 0,
+          fornitore:    item.fornitore    || '',
+          soglia_frigo: parseInt(item.soglia_frigo) || 2,
+          soglia_mag:   parseInt(item.soglia_mag)   || 6,
+          note:         item.note         || '',
+        });
+        const s = item.stock || {};
+        stock[id] = {
+          frigo:   parseInt(s.frigo)   || 0,
+          interno: parseInt(s.interno) || 0,
+          esterno: parseInt(s.esterno) || 0,
+        };
+        added++;
+      });
+      save(KEYS.vini, vini);
+      save(KEYS.stock, stock);
+      renderCantina();
+      alert(`Import completato: ${added} vini aggiunti, ${skipped} già presenti o non validi.`);
+    } catch(err) {
+      alert('Errore nel file JSON: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function quickSell(wineId) {
+  const stock = load(KEYS.stock) || {};
+  if (!stock[wineId] || stock[wineId].frigo < 1) { alert('Nessuna bottiglia disponibile nel frigo'); return; }
+  stock[wineId].frigo -= 1;
+  const movimenti = load(KEYS.movimenti) || [];
+  movimenti.push({ id:'m'+Date.now(), wine_id:wineId, tipo:'vendita', da:'frigo', a:null, qty:1, nota:'Vendita rapida', ts:new Date().toISOString() });
+  save(KEYS.stock, stock);
+  save(KEYS.movimenti, movimenti);
+  renderCantina();
+}
+
+// ══════════════════════════════════════════
+//  PRENOTAZIONI
+// ══════════════════════════════════════════
+let prenDate = new Date();
+let prenSvc  = 'pranzo';
+prenDate.setHours(0,0,0,0);
+
+const GIORNI = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+const MESI   = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Luglio','Agosto','Settembre','Ottobre','Novembre','Dicembre'];
+
+function dateKey(d) { return d.toISOString().split('T')[0]; }
+function sameDay(a,b) { return dateKey(a)===dateKey(b); }
+
+function renderPrenotazioni() {
+  renderDateDisplay();
+  renderWeekStrip();
+  renderTavoliMap();
+  renderResList();
+}
+
+function renderDateDisplay() {
+  const d = prenDate;
+  document.getElementById('pren-date-display').textContent =
+    `${GIORNI[d.getDay()]} ${d.getDate()} ${MESI[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+function renderWeekStrip() {
+  const strip = document.getElementById('week-strip');
+  const start = new Date(prenDate);
+  start.setDate(start.getDate() - 3);
+  const pren = load(KEYS.prenotazioni) || {};
+  let html = '';
+  for (let i=0;i<7;i++) {
+    const d = new Date(start); d.setDate(start.getDate()+i);
+    const dk = dateKey(d);
+    const dayData = pren[dk] || {};
+    const hasPranzo = (dayData.pranzo||[]).length > 0;
+    const hasCena   = (dayData.cena||[]).length > 0;
+    const isToday   = sameDay(d, new Date());
+    const isSel     = sameDay(d, prenDate);
+    html += `<div class="week-day ${isSel?'selected':''} ${isToday?'today':''}" onclick="selectDay(${d.getTime()})">
+      <div class="wd-name">${GIORNI[d.getDay()]}</div>
+      <div class="wd-num">${d.getDate()}</div>
+      <div class="wd-dots">
+        ${hasPranzo?'<div class="wd-dot pranzo"></div>':''}
+        ${hasCena  ?'<div class="wd-dot cena"></div>':''}
+      </div>
+    </div>`;
+  }
+  strip.innerHTML = html;
+}
+
+// ── sala & layout edit state ──
+let currentSala = 0;
+let editLayout   = false;
+const GRID_COLS  = 8;
+const GRID_ROWS  = 6;
+
+function setSala(idx) {
+  currentSala = idx;
+  document.querySelectorAll('.sala-tab').forEach((el,i) => el.classList.toggle('active', i===idx));
+  renderTavoliMap();
+}
+
+function toggleEditLayout() {
+  editLayout = !editLayout;
+  document.getElementById('edit-bar').classList.toggle('active', editLayout);
+  document.getElementById('edit-layout-btn').textContent = editLayout ? '✅ Fine modifica' : '✏️ Modifica layout';
+  renderTavoliMap();
+}
+
+function renderTavoliMap() {
+  const tavoli = load(KEYS.tavoli) || [];
+  const pren   = load(KEYS.prenotazioni) || {};
+  const dk     = dateKey(prenDate);
+  const dayRes = (pren[dk]||{})[prenSvc] || [];
+  const occupati = new Set(dayRes.map(r=>r.tavolo));
+
+  // update sala tab names
+  const sale = load(KEYS.sale) || [{id:0,nome:'Sala A'},{id:1,nome:'Sala B'},{id:2,nome:'Sala C'}];
+  sale.forEach((s,i) => {
+    const el = document.getElementById('sala-tab-'+i);
+    if (el) el.textContent = s.nome;
+  });
+
+  // Build grid: array of ROWS×COLS, each cell = null or tavolo
+  const grid = Array.from({length:GRID_ROWS}, () => Array(GRID_COLS).fill(null));
+  tavoli.filter(t => t.sala === currentSala).forEach(t => {
+    if (t.row < GRID_ROWS && t.col < GRID_COLS) grid[t.row][t.col] = t;
+  });
+
+  const map = document.getElementById('tavoli-map');
+  // set dynamic columns
+  map.style.gridTemplateColumns = `repeat(${GRID_COLS}, 1fr)`;
+
+  let html = '';
+  for (let r=0; r<GRID_ROWS; r++) {
+    for (let co=0; co<GRID_COLS; co++) {
+      const t = grid[r][co];
+      if (t) {
+        const occ = occupati.has(t.id);
+        const res = occ ? dayRes.find(x=>x.tavolo===t.id) : null;
+        if (editLayout) {
+          html += `<div class="tavolo cell-placed edit-mode" onclick="removeFromGrid(${t.id})" title="Clicca per rimuovere">
+            <div class="t-num">${t.nome||t.id}</div>
+            <div class="t-info">✕</div>
+          </div>`;
+        } else {
+          const cls = occ ? 'occupied-'+prenSvc : '';
+          const click = occ ? `openModalRes('${res.id}',null)` : `openModalRes(null,${t.id})`;
+          html += `<div class="tavolo ${cls}" onclick="${click}">
+            <div class="t-num">${t.nome||t.id}</div>
+            <div class="t-info">${occ ? res.nome.split(' ')[0] : t.posti+'p'}</div>
+          </div>`;
+        }
+      } else {
+        if (editLayout) {
+          html += `<div class="tavolo cell-empty edit-mode" onclick="addToGrid(${r},${co})" title="Aggiungi tavolo"></div>`;
+        } else {
+          html += `<div class="tavolo cell-empty"></div>`;
+        }
+      }
+    }
+  }
+  map.innerHTML = html;
+}
+
+function addToGrid(row, col) {
+  const tavoli = load(KEYS.tavoli) || [];
+  const maxId  = tavoli.reduce((m,t)=>Math.max(m,t.id),0);
+  const newId  = maxId + 1;
+  tavoli.push({ id:newId, sala:currentSala, row, col, posti:4, nome:'T'+newId });
+  save(KEYS.tavoli, tavoli);
+  renderTavoliMap();
+}
+
+function removeFromGrid(id) {
+  if (!confirm('Rimuovere questo tavolo dalla mappa?')) return;
+  const tavoli = (load(KEYS.tavoli)||[]).filter(t=>t.id!==id);
+  save(KEYS.tavoli, tavoli);
+  renderTavoliMap();
+}
+
+function renderResList() {
+  const pren = load(KEYS.prenotazioni) || {};
+  const dk   = dateKey(prenDate);
+  const day  = pren[dk] || { pranzo:[], cena:[] };
+  const list = document.getElementById('res-list');
+  let html = '';
+
+  ['pranzo','cena'].forEach(svc => {
+    const items = day[svc] || [];
+    const svcLabel = svc === 'pranzo' ? '☀️ Pranzo' : '🌙 Cena';
+    const coperti = items.reduce((s,r)=>s+r.coperti,0);
+    html += `<div class="res-svc-header">
+      <span class="res-svc-badge ${svc}">${svcLabel}</span>
+      <span class="res-svc-info">${items.length} prenotazioni · ${coperti} coperti</span>
+    </div>`;
+    if (items.length === 0) {
+      html += `<div class="add-empty" onclick="setSvcAndNew('${svc}')">+ Aggiungi prenotazione ${svc}</div>`;
+    } else {
+      items.sort((a,b)=>a.orario.localeCompare(b.orario)).forEach(r => {
+        const statoMap = { confermata:'stato-confermata', arrivata:'stato-arrivata', noshow:'stato-noshow' };
+        const statoLabel = { confermata:'Confermata', arrivata:'Arrivata', noshow:'No show' };
+        html += `<div class="res-card ${svc}-card" onclick="openModalRes('${r.id}',null)">
+          <div>
+            <div class="rc-name">${r.nome} ${r.tavolo?`<span style="font-size:11px;color:var(--text3);font-weight:400">· T.${r.tavolo}</span>`:''}</div>
+            <div class="rc-detail">${r.telefono||'—'} ${r.note?'· '+r.note:''}</div>
+          </div>
+          <div class="rc-time ${svc}">${r.orario}</div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            <div class="rc-guests">👥 ${r.coperti}</div>
+            <span class="stato-badge ${statoMap[r.stato]}">${statoLabel[r.stato]}</span>
+          </div>
+        </div>`;
+      });
+      html += `<div class="add-empty" onclick="setSvcAndNew('${svc}')">+ Aggiungi</div>`;
+    }
+  });
+  list.innerHTML = html;
+}
+
+function selectDay(ts) {
+  prenDate = new Date(ts);
+  renderPrenotazioni();
+}
+function shiftDay(n) {
+  prenDate.setDate(prenDate.getDate()+n);
+  renderPrenotazioni();
+}
+function goToday() {
+  prenDate = new Date(); prenDate.setHours(0,0,0,0);
+  renderPrenotazioni();
+}
+function setSvc(s) {
+  prenSvc = s;
+  document.getElementById('tab-pranzo').className = 'svc-tab' + (s==='pranzo'?' active pranzo':'');
+  document.getElementById('tab-cena').className   = 'svc-tab' + (s==='cena'  ?' active cena'  :'');
+  renderTavoliMap();
+}
+function setSvcAndNew(svc) {
+  prenSvc = svc;
+  setSvc(svc);
+  openModalRes(null, null);
+}
+
+// ── prenotazione modal ──
+function openModalRes(resId, presetTavolo) {
+  const pren = load(KEYS.prenotazioni) || {};
+  const dk   = dateKey(prenDate);
+  const allRes = [...((pren[dk]||{}).pranzo||[]), ...((pren[dk]||{}).cena||[])];
+  const r = resId ? allRes.find(x=>x.id===resId) : null;
+
+  document.getElementById('res-edit-id').value = resId || '';
+  document.getElementById('res-modal-title').textContent = r ? `Modifica — ${r.nome}` : 'Nuova prenotazione';
+  document.getElementById('res-delete-btn').style.display = r ? 'flex' : 'none';
+
+  document.getElementById('rf-nome').value     = r ? r.nome     : '';
+  document.getElementById('rf-coperti').value  = r ? r.coperti  : 2;
+  document.getElementById('rf-orario').value   = r ? r.orario   : (prenSvc==='pranzo'?'12:30':'20:00');
+  document.getElementById('rf-servizio').value = r ? (allRes.find(x=>x.id===resId) ? ((pren[dk]||{}).pranzo||[]).find(x=>x.id===resId)?'pranzo':'cena' : prenSvc) : prenSvc;
+  document.getElementById('rf-telefono').value = r ? r.telefono : '';
+  document.getElementById('rf-note').value     = r ? r.note     : '';
+  document.getElementById('rf-stato').value    = r ? r.stato    : 'confermata';
+
+  // populate tavoli select
+  const tavoli = load(KEYS.tavoli) || [];
+  const occupati = new Set(((pren[dk]||{})[prenSvc]||[]).filter(x=>!resId||x.id!==resId).map(x=>x.tavolo));
+  const sel = document.getElementById('rf-tavolo');
+  sel.innerHTML = '<option value="">— non assegnato —</option>' +
+    tavoli.map(t=>`<option value="${t.id}" ${occupati.has(t.id)?'disabled':''} ${(r?r.tavolo:presetTavolo)===t.id?'selected':''}>${t.nome||'T'+t.id} (${t.posti}p)${occupati.has(t.id)?' — occupato':''}</option>`).join('');
+
+  openModal('modal-res');
+  setTimeout(()=>document.getElementById('rf-nome').focus(),50);
+}
+
+function openNuovaPrenotazione() {
+  nav('prenotazioni');
+  setTimeout(()=>openModalRes(null,null),50);
+}
+
+function saveRes() {
+  const nome    = document.getElementById('rf-nome').value.trim();
+  const coperti = parseInt(document.getElementById('rf-coperti').value);
+  const orario  = document.getElementById('rf-orario').value;
+  if (!nome || !coperti || !orario) { alert('Compila: Nome, Coperti e Orario'); return; }
+
+  const pren   = load(KEYS.prenotazioni) || {};
+  const dk     = dateKey(prenDate);
+  const svc    = document.getElementById('rf-servizio').value;
+  const editId = document.getElementById('res-edit-id').value;
+
+  if (!pren[dk]) pren[dk] = { pranzo:[], cena:[] };
+  if (!pren[dk][svc]) pren[dk][svc] = [];
+
+  const payload = {
+    nome, coperti, orario, svc,
+    tavolo:   parseInt(document.getElementById('rf-tavolo').value) || null,
+    telefono: document.getElementById('rf-telefono').value.trim(),
+    note:     document.getElementById('rf-note').value.trim(),
+    stato:    document.getElementById('rf-stato').value,
+  };
+
+  if (editId) {
+    ['pranzo','cena'].forEach(s => {
+      const idx = (pren[dk][s]||[]).findIndex(r=>r.id===editId);
+      if (idx !== -1) pren[dk][s][idx] = { ...pren[dk][s][idx], ...payload };
+    });
+  } else {
+    pren[dk][svc].push({ id:'r'+Date.now(), ...payload });
+  }
+
+  save(KEYS.prenotazioni, pren);
+  closeModal('modal-res');
+  renderPrenotazioni();
+}
+
+function deleteRes() {
+  const editId = document.getElementById('res-edit-id').value;
+  if (!editId || !confirm('Eliminare questa prenotazione?')) return;
+  const pren = load(KEYS.prenotazioni) || {};
+  const dk   = dateKey(prenDate);
+  ['pranzo','cena'].forEach(s => {
+    if (pren[dk]?.[s]) pren[dk][s] = pren[dk][s].filter(r=>r.id!==editId);
+  });
+  save(KEYS.prenotazioni, pren);
+  closeModal('modal-res');
+  renderPrenotazioni();
+}
+
+// ══════════════════════════════════════════
+//  MODAL UTILS
+// ══════════════════════════════════════════
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(ov => {
+  ov.addEventListener('click', e => { if (e.target === ov) closeModal(ov.id); });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m=>closeModal(m.id));
+});
+
+
+// ══════════════════════════════════════════
+//  SALA
+// ══════════════════════════════════════════
+let salaSvc      = 'pranzo';
+let salaFilter   = 'tutti';
+let salaSelected = new Map(); // Map wine_id → qty
+let batchConfirmed = []; // parsed batch ready to confirm
+
+function setSalaSvc(s) {
+  salaSvc = s;
+  document.getElementById('sala-pill-pranzo').className = 'sala-svc-pill' + (s==='pranzo'?' active pranzo':'');
+  document.getElementById('sala-pill-cena').className   = 'sala-svc-pill' + (s==='cena'  ?' active cena'  :'');
+}
+
+function renderSala() {
+  renderSalaFilterBar();
+  renderSalaGrid();
+  renderRefillPanel();
+  updateSalaCounter();
+}
+
+function renderSalaFilterBar() {
+  const vini = load(KEYS.vini) || [];
+  const colori = ['tutti', ...new Set(vini.map(v=>v.colore))];
+  const labels = { tutti:'Tutti', rosso:'Rossi', bianco:'Bianchi', rose:'Rosé', orange:'Orange', bollicine:'Bollicine' };
+  document.getElementById('sala-filter-bar').innerHTML = colori.map(c =>
+    `<button class="filter-chip ${salaFilter===c?'active':''}" onclick="salaFilter='${c}';renderSalaGrid()">${labels[c]||c}</button>`
+  ).join('');
+}
+
+function renderSalaGrid() {
+  const vini  = load(KEYS.vini)  || [];
+  const stock = load(KEYS.stock) || {};
+  const colori = { rosso:'🔴', bianco:'🟡', rose:'🌸', orange:'🟠', bollicine:'🫧' };
+
+  // group by colore
+  const ordine = ['bollicine','bianco','orange','rose','rosso'];
+  const byColore = {};
+  vini.forEach(v => {
+    if (salaFilter !== 'tutti' && v.colore !== salaFilter) return;
+    if (!byColore[v.colore]) byColore[v.colore] = [];
+    byColore[v.colore].push(v);
+  });
+
+  let html = '';
+  ordine.forEach(col => {
+    if (!byColore[col]) return;
+    if (salaFilter === 'tutti') {
+      html += `<div style="grid-column:1/-1;font-size:10px;font-weight:600;color:var(--text3);letter-spacing:.07em;text-transform:uppercase;padding:4px 0 2px;">${colori[col]||''} ${col}</div>`;
+    }
+    byColore[col].forEach(v => {
+      const frigoQty = (stock[v.id]||{}).frigo || 0;
+      const sel = salaSelected.has(v.id);
+      const oos = frigoQty === 0;
+      const qty = salaSelected.get(v.id) || 0;
+      html += '<div class="sala-wine-cell ' + (sel?'selected':'') + ' ' + (oos?'out-of-stock':'') + '" data-wine-id="' + v.id + '" title="' + v.cantina + '">' +
+        (sel ? '<div class="swc-badge">×' + qty + '</div>' : '') +
+        '<div class="swc-name">' + v.nome + '</div>' +
+        '<div class="swc-producer">' + v.cantina + '</div>' +
+        '<div class="swc-stock ' + (frigoQty<=v.soglia_frigo?'low':'') + '">🧊 ' + frigoQty + ' in frigo</div>' +
+        '</div>';
+    });
+  });
+
+  const grid = document.getElementById('sala-grid');
+  grid.innerHTML = html || '<div style="color:var(--text3);font-size:13px;padding:20px;">Nessun vino trovato.</div>';
+  // attach click via delegation to avoid inline onclick quoting issues
+  grid.onclick = (e) => {
+    const cell = e.target.closest('.sala-wine-cell');
+    if (!cell || cell.classList.contains('out-of-stock')) return;
+    toggleSalaWine(cell.dataset.wineId);
+  };
+
+
+  // ── drag-up gesture on selected cells ──
+  // mousedown/touchstart → track Y → if dragged up ≥ 30px → +1, visual lift → snap back
+  let dragState = null;
+
+  function startDrag(e, cell) {
+    if (!cell || !cell.classList.contains('selected')) return;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    dragState = { cell, id: cell.dataset.wineId, startY: clientY, triggered: false };
+    cell.style.transition = 'transform 0.05s, box-shadow 0.05s';
+  }
+
+  function moveDrag(e) {
+    if (!dragState || dragState.triggered) return;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const dy = dragState.startY - clientY; // positive = dragged up
+    if (dy > 0) {
+      const lift = Math.min(dy * 0.25, 18);
+      dragState.cell.style.transform = 'translateY(-' + lift + 'px)';
+      dragState.cell.style.boxShadow = '0 ' + (4 + lift) + 'px 16px rgba(155,109,212,' + Math.min(0.35, lift/50) + ')';
+    }
+    if (dy >= 80 && !dragState.triggered) {
+      dragState.triggered = true;
+      const cell = dragState.cell;
+      const id   = dragState.id;
+      dragState  = null; // reset immediately so next drag can start fresh
+      adjustSalaQty(id, +1);
+      cell.style.transform = 'translateY(-22px) scale(1.06)';
+      cell.style.boxShadow = '0 18px 24px rgba(155,109,212,0.4)';
+      setTimeout(() => snapBack(cell), 200);
+    }
+  }
+
+  function endDrag() {
+    if (!dragState) return;
+    snapBack(dragState.cell);
+    dragState = null;
+  }
+
+  function snapBack(cell) {
+    if (!cell) return;
+    cell.style.transition = 'transform 0.25s cubic-bezier(.34,1.56,.64,1), box-shadow 0.25s';
+    cell.style.transform = '';
+    cell.style.boxShadow = '';
+  }
+
+  // mouse
+  grid.addEventListener('mousedown', (e) => {
+    const cell = e.target.closest('.sala-wine-cell');
+    if (cell) startDrag(e, cell);
+  });
+  window.addEventListener('mousemove', moveDrag);
+  window.addEventListener('mouseup', endDrag);
+
+  // touch
+  grid.addEventListener('touchstart', (e) => {
+    const cell = e.target.closest('.sala-wine-cell');
+    if (cell) startDrag(e, cell);
+  }, { passive: true });
+  grid.addEventListener('touchmove', moveDrag, { passive: true });
+  grid.addEventListener('touchend', endDrag, { passive: true });
+}
+
+function toggleSalaWine(id) {
+  if (salaSelected.has(id)) salaSelected.delete(id);
+  else salaSelected.set(id, 1);
+  renderSalaGrid();
+  updateSalaCounter();
+}
+
+function adjustSalaQty(id, delta) {
+  if (!salaSelected.has(id)) return;
+  const stock = load(KEYS.stock) || {};
+  const frigoQty = (stock[id]||{}).frigo || 0;
+  const current = salaSelected.get(id);
+  const next = current + delta;
+  if (next <= 0) { salaSelected.delete(id); }
+  else if (next > frigoQty) { /* can't exceed frigo stock */ }
+  else { salaSelected.set(id, next); }
+  renderSalaGrid();
+  updateSalaCounter();
+}
+
+function updateSalaCounter() {
+  const m = salaSelected.size;
+  const n = [...salaSelected.values()].reduce((s,q)=>s+q, 0);
+  document.getElementById('sc-n').textContent = n;
+  document.getElementById('sc-m').textContent = m;
+  const btn = document.getElementById('sala-confirm-btn');
+  btn.disabled = n === 0;
+}
+
+function confermaSelezione() {
+  if (salaSelected.size === 0) return;
+  const stock  = load(KEYS.stock)     || {};
+  const movimenti = load(KEYS.movimenti) || {};
+  const vini   = load(KEYS.vini)      || [];
+  const refills = load(KEYS.refill)   || [];
+
+  // find or create active refill for today+servizio
+  const dk  = new Date().toISOString().split('T')[0];
+  let refill = refills.find(r => r.data === dk && r.servizio === salaSvc && r.stato === 'attivo');
+  if (!refill) {
+    refill = { id:'rf'+Date.now(), data:dk, servizio:salaSvc, stato:'attivo', voci:[], creatoAlle: new Date().toISOString() };
+    refills.push(refill);
+  }
+
+  const sold = [];
+  const movArr = Array.isArray(movimenti) ? movimenti : [];
+  salaSelected.forEach((qty, id) => {
+    const v = vini.find(x=>x.id===id);
+    if (!v || qty<=0) return;
+    if (!stock[id]) stock[id] = {frigo:0,interno:0,esterno:0};
+    const effettive = Math.min(qty, stock[id].frigo);
+    stock[id].frigo -= effettive;
+    sold.push({ wine_id:id, nome:v.nome, cantina:v.cantina, prezzo:v.prezzo, qty:effettive, ts:new Date().toISOString() });
+    // accumulate in refill
+    const existing = refill.voci.find(x=>x.wine_id===id);
+    if (existing) existing.qty += effettive;
+    else refill.voci.push({ wine_id:id, nome:v.nome, cantina:v.cantina, prezzo:v.prezzo, qty:effettive });
+    // log movimenti (one per bottle for history granularity)
+    movArr.push({ id:'m'+Date.now()+Math.random(), wine_id:id, tipo:'vendita', da:'frigo', a:null, qty:effettive, nota:'Sala — '+salaSvc, ts:new Date().toISOString() });
+  });
+
+  save(KEYS.stock,    stock);
+  save(KEYS.refill,   refills);
+  save(KEYS.movimenti, movArr);
+
+  salaSelected = new Map();
+  renderSala();
+}
+
+function renderRefillPanel() {
+  const refills = load(KEYS.refill) || [];
+  const dk = new Date().toISOString().split('T')[0];
+  const attivi = refills.filter(r => r.stato === 'attivo');
+  const panel  = document.getElementById('refill-panel');
+  const actions = document.getElementById('refill-actions');
+  const badge  = document.getElementById('refill-count-badge');
+
+  // aggregate all active voci
+  const totale = {};
+  attivi.forEach(r => {
+    r.voci.forEach(v => {
+      if (!totale[v.wine_id]) totale[v.wine_id] = { nome:v.nome, cantina:v.cantina, qty:0, prezzo:v.prezzo };
+      totale[v.wine_id].qty += v.qty;
+    });
+  });
+
+  const items = Object.values(totale);
+  if (items.length === 0) {
+    panel.innerHTML = '<div class="refill-empty">Nessuna bottiglia da ricaricare.</div>';
+    actions.style.display = 'none';
+    badge.style.display = 'none';
+    return;
+  }
+
+  badge.textContent = items.reduce((s,x)=>s+x.qty,0) + ' bot.';
+  badge.style.display = 'inline-flex';
+  actions.style.display = 'flex';
+
+  panel.innerHTML = items.map(it =>
+    `<div class="refill-item">
+      <div class="ri-name">${it.nome}<div style="font-size:10px;color:var(--text3)">${it.cantina}</div></div>
+      <div class="ri-qty">×${it.qty}</div>
+    </div>`
+  ).join('');
+}
+
+function copyRefill() {
+  const refills = load(KEYS.refill) || [];
+  const attivi  = refills.filter(r => r.stato === 'attivo');
+  const totale  = {};
+  attivi.forEach(r => r.voci.forEach(v => {
+    if (!totale[v.wine_id]) totale[v.wine_id] = { nome:v.nome, qty:0 };
+    totale[v.wine_id].qty += v.qty;
+  }));
+  const testo = Object.values(totale).map(x=>x.nome+' ×'+x.qty).join('\n');
+  navigator.clipboard.writeText(testo).then(()=>alert('Lista copiata negli appunti!')).catch(()=>alert('Copia non riuscita — usa il testo nel pannello.'));
+}
+
+// ── BATCH ──
+function insertTestoBatch() {
+  document.getElementById('batch-input').value =
+`Ca del Bosco 1
+Barolo 2
+prosecco sup 1
+vermentino gallura 1
+amarone 1`;
+}
+
+function parseBatch() {
+  const raw = document.getElementById('batch-input').value.trim();
+  if (!raw) return;
+  const vini = load(KEYS.vini) || [];
+  const stock = load(KEYS.stock) || {};
+  const lines = raw.split('\n').map(l=>l.trim()).filter(Boolean);
+
+  const results = [];
+
+  lines.forEach(line => {
+    // Try to extract qty: number at start or end
+    let qty = 1;
+    let text = line;
+    const matchEnd   = line.match(/^(.+?)\s+(\d+)$/);
+    const matchStart = line.match(/^(\d+)\s+(.+)$/);
+    if (matchEnd)   { text = matchEnd[1];   qty = parseInt(matchEnd[2]); }
+    else if (matchStart) { text = matchStart[2]; qty = parseInt(matchStart[1]); }
+
+    // fuzzy match: find best matching wine
+    const q = text.toLowerCase().replace(/[^a-z0-9\s]/g,'');
+    let best = null, bestScore = 0;
+    vini.forEach(v => {
+      const target = (v.nome + ' ' + v.cantina).toLowerCase().replace(/[^a-z0-9\s]/g,'');
+      // word overlap score
+      const qWords = q.split(/\s+/).filter(w=>w.length>2);
+      const score  = qWords.filter(w => target.includes(w)).length / Math.max(qWords.length,1);
+      if (score > bestScore) { bestScore = score; best = v; }
+    });
+
+    const frigoQty = best ? ((stock[best.id]||{}).frigo||0) : 0;
+    results.push({ raw:line, wine:best, qty, score:bestScore, frigoQty });
+  });
+
+  batchConfirmed = results;
+  renderBatchPreview(results);
+}
+
+function renderBatchPreview(results) {
+  const prev = document.getElementById('batch-preview');
+  if (!results.length) { prev.innerHTML=''; return; }
+
+  let html = '<div style="margin-top:8px;">';
+  results.forEach((r,i) => {
+    const matched = r.wine && r.score > 0.3;
+    const color   = matched ? 'var(--text)' : 'var(--amber)';
+    html += `<div class="bp-row">
+      <div class="bp-name" style="color:${color}">
+        ${matched ? r.wine.nome : '⚠️ ' + r.raw}
+        ${matched && r.frigoQty < r.qty ? `<div class="bp-warn">frigo: ${r.frigoQty} disp.</div>` : ''}
+      </div>
+      <div class="bp-qty">×${r.qty}</div>
+    </div>`;
+  });
+  const matched = results.filter(r=>r.wine&&r.score>0.3).length;
+  html += `</div><button class="batch-parse-btn" style="margin-top:8px;background:var(--emerald);color:#fff;border-color:var(--emerald);" onclick="confermaBatch()">✅ Conferma ${matched}/${results.length} vini</button>`;
+  prev.innerHTML = html;
+}
+
+function confermaBatch() {
+  const stock  = load(KEYS.stock)     || {};
+  const movArr = load(KEYS.movimenti) || [];
+  const refills = load(KEYS.refill)  || [];
+  const dk  = new Date().toISOString().split('T')[0];
+  let refill = refills.find(r => r.data===dk && r.servizio===salaSvc && r.stato==='attivo');
+  if (!refill) {
+    refill = { id:'rf'+Date.now(), data:dk, servizio:salaSvc, stato:'attivo', voci:[], creatoAlle:new Date().toISOString() };
+    refills.push(refill);
+  }
+
+  batchConfirmed.forEach(r => {
+    if (!r.wine || r.score <= 0.3) return;
+    if (!stock[r.wine.id]) stock[r.wine.id] = {frigo:0,interno:0,esterno:0};
+    const effettive = Math.min(r.qty, stock[r.wine.id].frigo);
+    stock[r.wine.id].frigo -= effettive;
+    for (let i=0;i<effettive;i++) {
+      movArr.push({ id:'m'+Date.now()+Math.random(), wine_id:r.wine.id, tipo:'vendita', da:'frigo', a:null, qty:1, nota:'Batch — '+salaSvc, ts:new Date().toISOString() });
+    }
+    const existing = refill.voci.find(x=>x.wine_id===r.wine.id);
+    if (existing) existing.qty += effettive;
+    else if (effettive>0) refill.voci.push({ wine_id:r.wine.id, nome:r.wine.nome, cantina:r.wine.cantina, prezzo:r.wine.prezzo, qty:effettive });
+  });
+
+  save(KEYS.stock, stock);
+  save(KEYS.movimenti, movArr);
+  save(KEYS.refill, refills);
+  document.getElementById('batch-input').value = '';
+  document.getElementById('batch-preview').innerHTML = '';
+  batchConfirmed = [];
+  renderSala();
+}
+
+// ── REFILL MAGAZZINO (chiamato da cantina) ──
+let rfmDest = 'frigo';
+function setRfmDest(d) {
+  rfmDest = d;
+  document.getElementById('rfm-dest-frigo').classList.toggle('active', d==='frigo');
+  document.getElementById('rfm-dest-interno').classList.toggle('active', d==='interno');
+}
+
+function openRefillMagazzino() {
+  const refills = load(KEYS.refill) || [];
+  const attivi  = refills.filter(r=>r.stato==='attivo');
+  if (attivi.length === 0) { alert('Nessun Refill attivo.'); return; }
+
+  const totale = {};
+  attivi.forEach(r => r.voci.forEach(v => {
+    if (!totale[v.wine_id]) totale[v.wine_id] = { wine_id:v.wine_id, nome:v.nome, cantina:v.cantina, prezzo:v.prezzo, qty:0 };
+    totale[v.wine_id].qty += v.qty;
+  }));
+
+  const items = Object.values(totale);
+  rfmDest = 'frigo';
+  document.getElementById('rfm-dest-frigo').classList.add('active');
+  document.getElementById('rfm-dest-interno').classList.remove('active');
+
+  document.getElementById('rfm-list').innerHTML = items.map(it =>
+    `<div class="bp-row" style="padding:8px 0;">
+      <div style="display:flex;align-items:center;gap:8px;flex:1;">
+        <input type="checkbox" id="rfm-${it.wine_id}" checked style="accent-color:#9B6DD4;">
+        <label for="rfm-${it.wine_id}" style="font-size:13px;cursor:pointer;">
+          ${it.nome}
+          <span style="font-size:11px;color:var(--text3)"> — ${it.cantina}</span>
+        </label>
+      </div>
+      <input type="number" min="1" max="${it.qty}" value="${it.qty}" id="rfm-q-${it.wine_id}"
+        style="width:50px;padding:4px;border:1px solid var(--border);border-radius:4px;font-size:12px;text-align:center;">
+    </div>`
+  ).join('');
+
+  window._rfmItems = items;
+  openModal('modal-refill-mag');
+}
+
+function confermaRefillMag() {
+  const items  = window._rfmItems || [];
+  const stock  = load(KEYS.stock)     || {};
+  const movArr = load(KEYS.movimenti) || [];
+  const refills = load(KEYS.refill)   || [];
+
+  items.forEach(it => {
+    const chk = document.getElementById('rfm-'+it.wine_id);
+    const qty = parseInt(document.getElementById('rfm-q-'+it.wine_id).value)||0;
+    if (!chk?.checked || qty === 0) return;
+    if (!stock[it.wine_id]) stock[it.wine_id]={frigo:0,interno:0,esterno:0};
+    // scala da esterno, carica destinazione
+    const toScale = Math.min(qty, stock[it.wine_id].esterno);
+    stock[it.wine_id].esterno -= toScale;
+    stock[it.wine_id][rfmDest] += qty;
+    movArr.push({ id:'m'+Date.now()+Math.random(), wine_id:it.wine_id, tipo:'spostamento', da:'esterno', a:rfmDest, qty, nota:'Refill', ts:new Date().toISOString() });
+  });
+
+  // chiudi tutti i refill attivi → archivio cassa
+  const cassa = load(KEYS.cassa) || [];
+  const attivi = refills.filter(r=>r.stato==='attivo');
+  attivi.forEach(r => {
+    r.stato = 'completato';
+    r.completatoAlle = new Date().toISOString();
+    r.destinazione = rfmDest;
+    const totValore = r.voci.reduce((s,v)=>s+v.prezzo*v.qty, 0);
+    cassa.push({ ...r, valore:totValore });
+  });
+
+  save(KEYS.stock,    stock);
+  save(KEYS.movimenti, movArr);
+  save(KEYS.refill,   refills);
+  save(KEYS.cassa,    cassa);
+  closeModal('modal-refill-mag');
+  // re-render cantina if active
+  if (document.getElementById('cantina').classList.contains('active')) renderCantina();
+  if (document.getElementById('sala').classList.contains('active')) renderSala();
+  alert('Refill completato ✓ — vini caricati in ' + (rfmDest==='frigo'?'Frigo di servizio':'Magazzino interno'));
+}
+
+// init render
+renderCantina();
+</script>
+</body>
+</html>
